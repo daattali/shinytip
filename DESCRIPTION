@@ -1,0 +1,21 @@
+Package: shinytip
+Title: Simple Flexible Tootips for 'Shiny' Apps
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Dean", "Attali",
+        email = "daattali@gmail.com",
+        role = c("aut", "cre")
+    ))
+Description: Tooltips can be added to any 'Shiny' input and almost any element. Tooltips
+    can be customized through a variety of options such as tooltip position,
+    colour, size, and animation.
+URL: https://github.com/daattali/shinytip https://daattali.com/shiny/shinytip-demo/
+BugReports: https://github.com/daattali/shinytip/issues
+Depends:
+    R (>= 3.1.0)
+Imports:
+    shiny (>= 1.0.0)
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.1.2
+Roxygen: list(markdown = TRUE)
