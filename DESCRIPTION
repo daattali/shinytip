@@ -1,5 +1,5 @@
 Package: shinytip
-Title: Simple Flexible Tootips for 'Shiny' Apps
+Title: Simple Flexible Tooltips for 'Shiny' Apps
 Version: 0.0.0.9000
 Authors@R: c(
     person("Dean", "Attali",
