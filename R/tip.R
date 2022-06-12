@@ -84,7 +84,7 @@ tip <- function(
       tag,
       class = "shinytip-hide",
       `data-balloon-visible` = NA,
-      onclick = "this.classList.toggle('shinytip-hide');"
+      onclick = "this.classList.toggle('shinytip-hide'); return false;"
     )
   }
 

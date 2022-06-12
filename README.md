@@ -14,6 +14,8 @@ Balloon.css make use of pseudo-elements, so if pseudo elements are already in us
 
 set option for all tooltips using `shinytip.optionname`
 
+cant use HTML but can use emojis
+
 
 tippy doesn't work in all the scenarios i tried and doesnt support the optoins i wanted, although it does have a different et of options/methods that shinytip doesnt have so take a look there as well i shinytip doesnt do what you want. it's been in a "warning" state about its api changing for a year
 
