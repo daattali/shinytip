@@ -16,7 +16,8 @@ Depends:
 Imports:
     htmltools,
     knitr,
-    shiny (>= 1.0.0)
+    shiny (>= 1.0.0),
+    utils
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.2

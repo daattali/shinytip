@@ -7,7 +7,7 @@ works in modals
 works in modules
 
 does not automatically detect the best position
-only on hoer, not on click
+on moble you need to click away rather than click again
 
 Balloon.css make use of pseudo-elements, so if pseudo elements are already in use on an element, the tooltip will conflict with them resulting in potential bugs.
 
@@ -15,4 +15,7 @@ Balloon.css make use of pseudo-elements, so if pseudo elements are already in us
 set option for all tooltips using `shinytip.optionname`
 
 
-tippy doesn't work in all the scenarios i tried and doesnt support the optoins i wanted, although it does have a different et of options/methods that shinytip doesnt have so take a look there as well i shinytip doesnt do what you want
+tippy doesn't work in all the scenarios i tried and doesnt support the optoins i wanted, although it does have a different et of options/methods that shinytip doesnt have so take a look there as well i shinytip doesnt do what you want. it's been in a "warning" state about its api changing for a year
+
+
+prompter: must add use_prompt(), must define a position
