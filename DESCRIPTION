@@ -20,5 +20,5 @@ Imports:
     utils
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
