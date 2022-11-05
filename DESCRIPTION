@@ -4,7 +4,8 @@ Version: 0.0.0.9000
 Authors@R: c(
     person("Dean", "Attali",
         email = "daattali@gmail.com",
-        role = c("aut", "cre")
+        role = c("aut", "cre"),
+        comment = c(ORCID="0000-0002-5645-3493")
     ))
 Description: Tooltips can be added to any 'Shiny' input and almost any element. Tooltips
     can be customized through a variety of options such as tooltip position,
