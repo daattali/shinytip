@@ -4,10 +4,10 @@
 #' Text: span
 #' @param tag The tag
 #' @param content the content
-#' @param position ths positon
-#' @param length legnth fo sds
+#' @param position the position
+#' @param length length of tip
 #' @param bg background
-#' @param fg foregroun
+#' @param fg foreground
 #' @export
 tip <- function(
     tag,
@@ -42,7 +42,7 @@ tip <- function(
   }
 
   if (missing(content) || !nzchar(trimws(content))) {
-    stop("tip: Must proide non-empty content", call. = FALSE)
+    stop("tip: Must provide non-empty content", call. = FALSE)
   }
 
   if (is.numeric(size)) {
@@ -59,7 +59,7 @@ tip <- function(
     css <- paste0(css, "cursor: inherit; ")
   }
 
-  if (is.null(tag) || is.na(tag) || length(tag) == 0) {
+  if (is.null(tag) || identical(tag, NA) || length(tag) == 0) {
     stop("tip: `tag` must not be empty", call. = FALSE)
   }
 
@@ -113,10 +113,11 @@ tip <- function(
   htmltools::attachDependencies(
     tag,
     htmltools::htmlDependency(
-      name = "balloon",
+      name = "balloon-css",
       version = "1.2.0",
-      src = c(href = "shinytip-assets/lib"),
-      stylesheet = "balloon-1.2.0/balloon.min.css",
+      package = "shinytip",
+      src = "assets/lib/balloon-1.2.0",
+      stylesheet = "balloon.min.css",
       head = "<style>.shinytip-hide:before, .shinytip-hide:after { display: none; }</style>"
     )
   )

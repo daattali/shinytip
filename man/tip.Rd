@@ -23,13 +23,13 @@ tip(
 
 \item{content}{the content}
 
-\item{position}{ths positon}
+\item{position}{the position}
 
-\item{length}{legnth fo sds}
+\item{length}{length of tip}
 
 \item{bg}{background}
 
-\item{fg}{foregroun}
+\item{fg}{foreground}
 }
 \description{
 img input i: div
