@@ -64,7 +64,7 @@ tip <- function(
   }
 
   if (inherits(tag, "shiny.tag.list") ||
-      inherits(tag, "shiny.tag") && (tag$name %in% c("img", "input", "i"))) {
+      (inherits(tag, "shiny.tag") && (tag$name %in% c("img", "input", "i")))) {
     tag <- shiny::div(tag)
     css <- paste0(css, "display: inline-block; ")
   } else if (!inherits(tag, "shiny.tag")) {
@@ -102,16 +102,7 @@ tip <- function(
     )
   }
 
-  runtime <- knitr::opts_knit$get("rmarkdown.runtime")
-  if (!is.null(runtime) && runtime == "shiny") {
-    # we're inside an Rmd document
-    insert_into_doc <- shiny::tagList
-  } else {
-    # we're in a shiny app
-    insert_into_doc <- shiny::tags$head
-  }
-
-  htmltools::attachDependencies(
+  tag <- tagList(
     tag,
     htmltools::htmlDependency(
       name = "balloon-css",
@@ -122,6 +113,7 @@ tip <- function(
       head = "<style>.shinytip-hide:before, .shinytip-hide:after { display: none; }</style>"
     )
   )
+  tag
 }
 
 #' @export
