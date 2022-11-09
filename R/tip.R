@@ -63,7 +63,8 @@ tip <- function(
     stop("tip: `tag` must not be empty", call. = FALSE)
   }
 
-  if (inherits(tag, "shiny.tag") && (tag$name %in% c("img", "input", "i"))) {
+  if (inherits(tag, "shiny.tag.list") ||
+      inherits(tag, "shiny.tag") && (tag$name %in% c("img", "input", "i"))) {
     tag <- shiny::div(tag)
     css <- paste0(css, "display: inline-block; ")
   } else if (!inherits(tag, "shiny.tag")) {
