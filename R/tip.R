@@ -102,7 +102,7 @@ tip <- function(
     )
   }
 
-  tag <- tagList(
+  tag <- shiny::tagList(
     tag,
     htmltools::htmlDependency(
       name = "balloon-css",
