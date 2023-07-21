@@ -22,6 +22,10 @@
 
 ---
 
+<!-- badges: start -->
+  [![R-CMD-check](https://github.com/daattali/shinytip/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/daattali/shinytip/actions/workflows/R-CMD-check.yaml)
+  <!-- badges: end -->
+
 <img src="inst/img/hex.png" width="170" align="right"/>
 
 # shinytip
@@ -40,10 +44,10 @@ Balloon.css make use of pseudo-elements, so if pseudo elements are already in us
 
 set option for all tooltips using `shinytip.optionname`
 
-cant use HTML but can use emojis
+cant use HTML but cant use emojis
 
 
 tippy doesn't work in all the scenarios i tried and doesnt support the optoins i wanted, although it does have a different et of options/methods that shinytip doesnt have so take a look there as well i shinytip doesnt do what you want. it's been in a "warning" state about its api changing for a year
 
 
-prompter: must add use_prompt(), must define a position
+prompter: must add use_prompt()
