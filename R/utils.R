@@ -1,10 +1,28 @@
+has_class <- function(tag, class) {
+  if (!inherits(tag, "shiny.tag")) {
+    stop("has_class: `tag` must be a shiny tag")
+  }
+  if (!nzchar(class)) {
+    stop("has_class: `class` must be a non-empty string")
+  }
+  if (grepl("\\s", class)) {
+    stop("has_class: `class` cannot contain any whitespace")
+  }
+
+  classes <- htmltools::tagGetAttribute(tag, "class")
+  if (is.null(classes)) {
+    return(FALSE)
+  }
+  classes <- strsplit(classes, "\\s+")[[1]]
+  class %in% classes
+}
+
 is_checkbox <- function(tag) {
   if (!inherits(tag, "shiny.tag")) {
     return(FALSE)
   }
 
-  classes <- htmltools::tagGetAttribute(tag, "class")
-  if (is.null(classes) || !"shiny-input-container" %in% strsplit(classes, " ")[[1]]) {
+  if (!has_class(tag, "shiny-input-container")) {
     return(FALSE)
   }
 
@@ -12,12 +30,7 @@ is_checkbox <- function(tag) {
     return(FALSE)
   }
 
-  child_classes <- htmltools::tagGetAttribute(tag$children[[1]], "class")
-  if (is.null(child_classes) || !"checkbox" %in% strsplit(child_classes, " ")[[1]]) {
-    return(FALSE)
-  }
-
-  if (!tag$children[[1]]$children[[1]]$name == "label") {
+  if (!has_class(tag$children[[1]], "checkbox")) {
     return(FALSE)
   }
 
