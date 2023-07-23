@@ -4,5 +4,5 @@ runtime: shiny
 ---
 
 ```{r}
-shinytip::tip("hover over me", "this is a tooltip", position = "down")
+shinytip::tip("hover over me", "this is a tooltip", position = "bottom")
 ```

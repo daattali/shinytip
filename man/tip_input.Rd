@@ -7,7 +7,7 @@
 tip_input(
   tag,
   content,
-  position = getOption("shinytip.position", "up"),
+  position = getOption("shinytip.position", "top"),
   length = getOption("shinytip.length", "line"),
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
@@ -24,8 +24,8 @@ tip_input(
 
 \item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
 
-\item{position}{The position of the tooltip in relation to the tag. One of: \code{"up"}, \code{"down"},
-\code{"left"}, \code{"right"}, \code{"up-left"}, \code{"up-right"}, \code{"down-left"}, \code{"down-right"}.}
+\item{position}{The position of the tooltip in relation to the tag. One of: \code{"top"}, \code{"bottom"},
+\code{"left"}, \code{"right"}, \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}.}
 
 \item{length}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
 line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),

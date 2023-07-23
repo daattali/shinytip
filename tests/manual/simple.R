@@ -16,19 +16,19 @@ ui <- fluidPage(fluidRow(
     tip(
       "tip on the bottom right, small",
       sample_text,
-      position = "down-right",
+      position = "bottom-right",
       length = "s"
     ), br(),
     tip(
       "tip on the top left, extra large",
       sample_text,
-      position = "up-left",
+      position = "top-left",
       length = "xl"
     ), br(),
     tip(
       div("tip on a div; bottom, red background, yellow colour, fit within the dimensions of the parent"),
       sample_text,
-      position = "down",
+      position = "bottom",
       length = "fit",
       bg = "red",
       fg = "yellow"

@@ -24,8 +24,8 @@
 #' is not a supported interaction.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
-#' @param position The position of the tooltip in relation to the tag. One of: `"up"`, `"down"`,
-#' `"left"`, `"right"`, `"up-left"`, `"up-right"`, `"down-left"`, `"down-right"`.
+#' @param position The position of the tooltip in relation to the tag. One of: `"top"`, `"bottom"`,
+#' `"left"`, `"right"`, `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`.
 #' @param length How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
 #' line), `"fit"` (the tooltip should have the same width as the tag), `"s"` (small), `"m"` (medium),
 #' `"l"` (large), `"xl"` (extra large).
@@ -58,7 +58,7 @@
 tip <- function(
     tag,
     content,
-    position = getOption("shinytip.position", "up"),
+    position = getOption("shinytip.position", "top"),
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
@@ -68,10 +68,12 @@ tip <- function(
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
 
-  allowed_position <- c("up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right")
+  allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
   if (!position %in% allowed_position) {
     stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
   }
+  position <- sub("top", "up", position)
+  position <- sub("bottom", "down", position)
 
   allowed_length <- c("line", "fit", "s", "m", "l", "xl")
   if (!length %in% allowed_length) {
@@ -184,7 +186,7 @@ tip <- function(
 #' @export
 tip_icon <- function(
     content,
-    position = getOption("shinytip.position", "up"),
+    position = getOption("shinytip.position", "top"),
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
@@ -211,7 +213,7 @@ tip_icon <- function(
 tip_input <- function(
     tag,
     content,
-    position = getOption("shinytip.position", "up"),
+    position = getOption("shinytip.position", "top"),
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),

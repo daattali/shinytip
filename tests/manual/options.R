@@ -22,7 +22,7 @@ ui <- fluidPage(
   tip(
     "blue tip on bottom",
     sample_text,
-    position = "down",
+    position = "bottom",
     fg = "blue",
     click = FALSE
   )
