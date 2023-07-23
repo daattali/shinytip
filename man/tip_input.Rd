@@ -5,7 +5,7 @@
 \title{tip the input}
 \usage{
 tip_input(
-  input,
+  tag,
   content,
   position = getOption("shinytip.position", "up"),
   length = getOption("shinytip.length", "line"),
@@ -17,6 +17,33 @@ tip_input(
   pointer = getOption("shinytip.pointer", TRUE),
   ...
 )
+}
+\arguments{
+\item{tag}{A Shiny tag, tagList, or plain text to add a tooltip to.}
+
+\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
+
+\item{position}{The position of the tooltip in relation to the tag. One of: \code{"up"}, \code{"down"},
+\code{"left"}, \code{"right"}, \code{"up-left"}, \code{"up-right"}, \code{"down-left"}, \code{"down-right"}.}
+
+\item{length}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
+line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
+\code{"l"} (large), \code{"xl"} (extra large).}
+
+\item{bg}{Background colour of the tooltip.}
+
+\item{fg}{Colour of the tooltip text.}
+
+\item{size}{The font size of the tooltip text.}
+
+\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
+only show when the tag is clicked.}
+
+\item{animate}{If \code{FALSE}, don't animate the tooltip appearing and disappearing.}
+
+\item{pointer}{If \code{FALSE}, don't change the cursor when hovering over the tag.}
+
+\item{...}{Additional parameters to pass to the tag.}
 }
 \description{
 tip the input

@@ -6,22 +6,26 @@ Authors@R: c(
         email = "daattali@gmail.com",
         role = c("aut", "cre"),
         comment = c(ORCID="0000-0002-5645-3493")
+    ),
+    person("Claudio", "Holanda", role = "aut",
+        comment = "Author of balloon.css"
     ))
 Description: Tooltips can be added to any 'Shiny' input and almost any element. Tooltips
     can be customized through a variety of options such as tooltip position,
-    colour, size, and animation.
-URL: https://github.com/daattali/shinytip https://daattali.com/shiny/shinytip-demo/
+    colour, size, and animation. Based on the 'balloon.css' project.
+URL: https://github.com/daattali/shinytip
 BugReports: https://github.com/daattali/shinytip/issues
 Depends:
     R (>= 3.1.0)
 Imports:
     htmltools (>= 0.3.5),
-    shiny (>= 1.0.0),
-    utils
+    shiny (>= 1.0.0)
+Suggests:
+  shinyalert,
+  shinycssloaders,
+  testthat (>= 3.0.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
-Suggests: 
-    testthat (>= 3.0.0)
 Config/testthat/edition: 3

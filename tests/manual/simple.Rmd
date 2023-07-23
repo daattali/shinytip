@@ -1,0 +1,8 @@
+---
+output: html_document
+runtime: shiny
+---
+
+```{r}
+shinytip::tip("hover over me", "this is a tooltip", position = "down")
+```

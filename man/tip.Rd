@@ -19,19 +19,77 @@ tip(
 )
 }
 \arguments{
-\item{tag}{The tag}
+\item{tag}{A Shiny tag, tagList, or plain text to add a tooltip to.}
 
-\item{content}{the content}
+\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
 
-\item{position}{the position}
+\item{position}{The position of the tooltip in relation to the tag. One of: \code{"up"}, \code{"down"},
+\code{"left"}, \code{"right"}, \code{"up-left"}, \code{"up-right"}, \code{"down-left"}, \code{"down-right"}.}
 
-\item{length}{length of tip}
+\item{length}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
+line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
+\code{"l"} (large), \code{"xl"} (extra large).}
 
-\item{bg}{background}
+\item{bg}{Background colour of the tooltip.}
 
-\item{fg}{foreground}
+\item{fg}{Colour of the tooltip text.}
+
+\item{size}{The font size of the tooltip text.}
+
+\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
+only show when the tag is clicked.}
+
+\item{animate}{If \code{FALSE}, don't animate the tooltip appearing and disappearing.}
+
+\item{pointer}{If \code{FALSE}, don't change the cursor when hovering over the tag.}
+
+\item{...}{Additional parameters to pass to the tag.}
+}
+\value{
+A tag that supports tooltips.
 }
 \description{
-img input i: div
-Text: span
+Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
+Tooltips are powered by the project \code{balloon.css}.\cr\cr
+Most parameters can be set globally in order to use a default setting for all tooltips in your
+Shiny app. This can be done by setting an R option with the parameter's name prepended by
+\code{"shinytip."}. For example, to set all tooltips to appear on the right and have a red background,
+use \code{options(shinytip.position = "right", shinytip.bg = "red")}. Only \code{tag} and \code{content} cannot
+be set globally.
+}
+\details{
+Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome), the tag will get
+wrapped in a \verb{<div>}. When adding a tooltip to plain text, the text is wrapped in a \verb{<span>}. In
+all other cases, no additional HTML tags are created.
+}
+\section{Limitations}{
+
+\itemize{
+\item The best position for the tooltip cannot be determined automatically.
+This means that you may need to adjust the position of the tooltip depending on where it appears
+on the page.
+\item The balloon project makes use of pseudo-elements, so if you're trying to
+add a tooltip to an element that already has pseudo-elements, it may not work.
+\item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
+is not an action that can be done on touch devices.
+}
+}
+
+\examples{
+if (interactive()) {
+  library(shiny)
+  library(shinytip)
+
+  shinyApp(
+    ui = fluidPage(
+      tip("some text", "a tooltip", position = "right"), br(), br(), br(),
+      tip(actionButton("btn", "hover me"), "Hello")
+    ),
+    server = function(input, output) {}
+  )
+}
+
+}
+\seealso{
+\code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_icon]{tip_icon()}}
 }

@@ -1,0 +1,8 @@
+---
+format: html
+editor: visual
+---
+
+```{r}
+shinytip::tip("hover over me", "this is a tooltip", position = "right")
+```

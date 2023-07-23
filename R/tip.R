@@ -1,13 +1,58 @@
 #' Add a tooltip to a Shiny element or text
 #'
-#' img input i: div
-#' Text: span
-#' @param tag The tag
-#' @param content the content
-#' @param position the position
-#' @param length length of tip
-#' @param bg background
-#' @param fg foreground
+#' Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
+#' Tooltips are powered by the project `balloon.css`.\cr\cr
+#' Most parameters can be set globally in order to use a default setting for all tooltips in your
+#' Shiny app. This can be done by setting an R option with the parameter's name prepended by
+#' `"shinytip."`. For example, to set all tooltips to appear on the right and have a red background,
+#' use `options(shinytip.position = "right", shinytip.bg = "red")`. Only `tag` and `content` cannot
+#' be set globally.
+#'
+#' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome), the tag will get
+#' wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped in a `<span>`. In
+#' all other cases, no additional HTML tags are created.
+#'
+#' @section Limitations:
+#' - The best position for the tooltip cannot be detected automatically.
+#' This means that you may need to adjust the position of the tooltip depending on where it appears
+#' on the page.
+#'
+#' - The balloon project makes use of pseudo-elements, so if you're trying to
+#' add a tooltip to an element that already has pseudo-elements, it may not work.
+#'
+#' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
+#' is not a supported interaction.
+#' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
+#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
+#' @param position The position of the tooltip in relation to the tag. One of: `"up"`, `"down"`,
+#' `"left"`, `"right"`, `"up-left"`, `"up-right"`, `"down-left"`, `"down-right"`.
+#' @param length How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
+#' line), `"fit"` (the tooltip should have the same width as the tag), `"s"` (small), `"m"` (medium),
+#' `"l"` (large), `"xl"` (extra large).
+#' @param bg Background colour of the tooltip.
+#' @param fg Colour of the tooltip text.
+#' @param size The font size of the tooltip text.
+#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip will
+#' only show when the tag is clicked.
+#' @param animate If `FALSE`, don't animate the tooltip appearing and disappearing.
+#' @param pointer If `FALSE`, don't change the cursor when hovering over the tag.
+#' @param ... Additional parameters to pass to the tag.
+#' @return A tag that supports tooltips.
+#' @seealso [tip_input()], [tip_icon()]
+#' @examples
+#' if (interactive()) {
+#'   library(shiny)
+#'   library(shinytip)
+#'
+#'   shinyApp(
+#'     ui = fluidPage(
+#'       tip("some text", "a tooltip", position = "right"), br(), br(), br(),
+#'       tip(actionButton("btn", "hover me"), "Hello")
+#'     ),
+#'     server = function(input, output) {}
+#'   )
+#' }
+#'
 #' @export
 tip <- function(
     tag,
@@ -24,12 +69,12 @@ tip <- function(
 
   allowed_position <- c("up", "down", "left", "right", "up-left", "up-right", "down-left", "down-right")
   if (!position %in% allowed_position) {
-    stop("tip: `position` must be one of: [", paste(allowed_position, collapse = ", "), "]", call. = FALSE)
+    stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
   }
 
   allowed_length <- c("line", "fit", "s", "m", "l", "xl")
   if (!length %in% allowed_length) {
-    stop("tip: `length` must be one of: [", paste(allowed_length, collapse = ", "), "]", call. = FALSE)
+    stop("tip: `length` must be one of: [", toString(allowed_length), "]", call. = FALSE)
   }
   if (length == "s") {
     length <- "small"
@@ -116,6 +161,7 @@ tip <- function(
   tag
 }
 
+#' @inheritParams tip
 #' @export
 tip_icon <- function(
     content,
@@ -138,9 +184,10 @@ tip_icon <- function(
 }
 
 #' tip the input
+#' @inheritParams tip
 #' @export
 tip_input <- function(
-    input,
+    tag,
     content,
     position = getOption("shinytip.position", "up"),
     length = getOption("shinytip.length", "line"),
@@ -151,23 +198,23 @@ tip_input <- function(
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
-  if (!inherits(input, "shiny.tag")) {
-    stop("tip_input: `input` must be a Shiny input tag", call. = FALSE)
+  if (!inherits(tag, "shiny.tag")) {
+    stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
   }
 
-  classes <- htmltools::tagGetAttribute(input, "class")
+  classes <- htmltools::tagGetAttribute(tag, "class")
   if (is.null(classes) || !"shiny-input-container" %in% strsplit(classes, " ")[[1]]) {
-    stop("tip_input: `input` must be a Shiny input tag", call. = FALSE)
+    stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
   }
 
   found_label <- FALSE
-  for (idx in seq_along(input$children)) {
-    tag <- input$children[[idx]]
-    if (tag$name == "label" && !is.null(tag$children) &&
-        length(tag$children) > 0 && !is.null(tag$children[[1]])) {
+  for (idx in seq_along(tag$children)) {
+    child <- tag$children[[idx]]
+    if (child$name == "label" && !is.null(child$children) &&
+        length(child$children) > 0 && !is.null(child$children[[1]])) {
       found_label <- TRUE
-      tag <- htmltools::tagAppendChild(
-        tag,
+      child <- htmltools::tagAppendChild(
+        child,
         tip_icon(
           content = content, position = position,
           length = length, bg = bg, fg = fg,
@@ -175,14 +222,14 @@ tip_input <- function(
           ...
         )
       )
-      input$children[[idx]] <- tag
+      tag$children[[idx]] <- child
       break
     }
   }
   if (!found_label) {
     # checkboxes have a different structure since they don't have a typical <label>
-    if (is_checkbox(input)) {
-      label <- input$children[[1]]$children[[1]]
+    if (is_checkbox(tag)) {
+      label <- tag$children[[1]]$children[[1]]
       label <- htmltools::tagAppendChild(
         label,
         tip_icon(
@@ -192,11 +239,11 @@ tip_input <- function(
           ...
         )
       )
-      input$children[[1]]$children[[1]] <- label
+      tag$children[[1]]$children[[1]] <- label
     } else {
-      stop("tip_input: `input` must have a label", call. = FALSE)
+      stop("tip_input: `tag` must have a label", call. = FALSE)
     }
   }
 
-  input
+  tag
 }
