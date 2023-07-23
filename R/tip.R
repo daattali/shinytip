@@ -30,14 +30,14 @@
 #' line), `"fit"` (the tooltip should have the same width as the tag), `"s"` (small), `"m"` (medium),
 #' `"l"` (large), `"xl"` (extra large).
 #' @param bg Background colour of the tooltip.
-#' @param fg Colour of the tooltip text.
+#' @param fg Colour ("foreground") of the tooltip text.
 #' @param size The font size of the tooltip text.
 #' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip will
 #' only show when the tag is clicked.
 #' @param animate If `FALSE`, don't animate the tooltip appearing and disappearing.
 #' @param pointer If `FALSE`, don't change the cursor when hovering over the tag.
 #' @param ... Additional parameters to pass to the tag.
-#' @return A tag that supports tooltips.
+#' @return A Shiny tag that supports tooltips.
 #' @seealso [tip_input()], [tip_icon()]
 #' @examples
 #' if (interactive()) {
@@ -46,8 +46,9 @@
 #'
 #'   shinyApp(
 #'     ui = fluidPage(
-#'       tip("some text", "a tooltip", position = "right"), br(), br(), br(),
-#'       tip(actionButton("btn", "hover me"), "Hello")
+#'       tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
+#'       tip(actionButton("btn", "hover me"), "Hello"),
+#'       tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE)
 #'     ),
 #'     server = function(input, output) {}
 #'   )
@@ -161,7 +162,25 @@ tip <- function(
   tag
 }
 
+#' Create a tooltip icon
+#'
+#' Add a question-mark icon that shows a tooltip when hovered or clicked.
 #' @inheritParams tip
+#' @param solid If `TRUE`, the question-mark icon will have a solid background.
+#' @return A Shiny icon tag that has a tooltip.
+#' @seealso [tip()], [tip_input()]
+#' @examples
+#' if (interactive()) {
+#'   library(shiny)
+#'   library(shinytip)
+#'
+#'   shinyApp(
+#'     ui = fluidPage(
+#'       "Section one", tip_icon("This is where some inputs will go", position = "right")
+#'     ),
+#'     server = function(input, output) {}
+#'   )
+#' }
 #' @export
 tip_icon <- function(
     content,
@@ -173,9 +192,10 @@ tip_icon <- function(
     click = getOption("shinytip.click", FALSE),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
+    solid = getOption("shinytip.solid", FALSE),
     ...) {
   tip(
-    tag = shiny::icon("question-circle"),
+    tag = shiny::icon("question-circle", class = if (solid) "fa-solid"),
     content = content,
     position = position, length = length, bg = bg, fg = fg,
     size = size, click = click, animate = animate, pointer = pointer,
@@ -185,6 +205,8 @@ tip_icon <- function(
 
 #' tip the input
 #' @inheritParams tip
+#' @inheritParams tip_icon
+#' @param tag TODO
 #' @export
 tip_input <- function(
     tag,
@@ -197,6 +219,7 @@ tip_input <- function(
     click = getOption("shinytip.click", FALSE),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
+    solid = getOption("shinytip.solid", FALSE),
     ...) {
   if (!inherits(tag, "shiny.tag")) {
     stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)

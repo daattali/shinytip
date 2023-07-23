@@ -32,7 +32,7 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 
 \item{bg}{Background colour of the tooltip.}
 
-\item{fg}{Colour of the tooltip text.}
+\item{fg}{Colour ("foreground") of the tooltip text.}
 
 \item{size}{The font size of the tooltip text.}
 
@@ -46,7 +46,7 @@ only show when the tag is clicked.}
 \item{...}{Additional parameters to pass to the tag.}
 }
 \value{
-A tag that supports tooltips.
+A Shiny tag that supports tooltips.
 }
 \description{
 Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
@@ -65,13 +65,13 @@ all other cases, no additional HTML tags are created.
 \section{Limitations}{
 
 \itemize{
-\item The best position for the tooltip cannot be determined automatically.
+\item The best position for the tooltip cannot be detected automatically.
 This means that you may need to adjust the position of the tooltip depending on where it appears
 on the page.
 \item The balloon project makes use of pseudo-elements, so if you're trying to
 add a tooltip to an element that already has pseudo-elements, it may not work.
 \item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
-is not an action that can be done on touch devices.
+is not a supported interaction.
 }
 }
 
@@ -82,8 +82,9 @@ if (interactive()) {
 
   shinyApp(
     ui = fluidPage(
-      tip("some text", "a tooltip", position = "right"), br(), br(), br(),
-      tip(actionButton("btn", "hover me"), "Hello")
+      tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
+      tip(actionButton("btn", "hover me"), "Hello"),
+      tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE)
     ),
     server = function(input, output) {}
   )
