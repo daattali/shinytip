@@ -2,7 +2,7 @@
 % Please edit documentation in R/tip.R
 \name{tip_input}
 \alias{tip_input}
-\title{tip the input}
+\title{Add a tooltip to the label of an input}
 \usage{
 tip_input(
   tag,
@@ -20,7 +20,7 @@ tip_input(
 )
 }
 \arguments{
-\item{tag}{TODO}
+\item{tag}{A Shiny input tag.}
 
 \item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
 
@@ -48,6 +48,30 @@ only show when the tag is clicked.}
 
 \item{...}{Additional parameters to pass to the tag.}
 }
+\value{
+The same input tag, with a question-mark icon in the label that triggers a tooltip.
+}
 \description{
-tip the input
+Modifies an input's label to include a question-mark icon at the end that has a tooltip.
+}
+\examples{
+if (interactive()) {
+  library(shiny)
+  library(shinytip)
+
+  shinyApp(
+    ui = fluidPage(br(),
+      tip_input(
+        textInput("name", "Name"),
+        "Enter your full name as appears on your passport",
+        position = "right"
+      )
+    ),
+    server = function(input, output) {}
+  )
+}
+
+}
+\seealso{
+\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}
 }

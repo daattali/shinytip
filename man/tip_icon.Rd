@@ -58,11 +58,12 @@ if (interactive()) {
 
   shinyApp(
     ui = fluidPage(
-      "Section one", tip_icon("This is where some inputs will go", position = "right")
+      h2("Section one", tip_icon("This is where some inputs will go", position = "right"))
     ),
     server = function(input, output) {}
   )
 }
+
 }
 \seealso{
 \code{\link[=tip]{tip()}}, \code{\link[=tip_input]{tip_input()}}

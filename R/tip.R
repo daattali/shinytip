@@ -178,11 +178,12 @@ tip <- function(
 #'
 #'   shinyApp(
 #'     ui = fluidPage(
-#'       "Section one", tip_icon("This is where some inputs will go", position = "right")
+#'       h2("Section one", tip_icon("This is where some inputs will go", position = "right"))
 #'     ),
 #'     server = function(input, output) {}
 #'   )
 #' }
+#'
 #' @export
 tip_icon <- function(
     content,
@@ -205,10 +206,31 @@ tip_icon <- function(
   )
 }
 
-#' tip the input
+#' Add a tooltip to the label of an input
+#'
+#' Modifies an input's label to include a question-mark icon at the end that has a tooltip.
 #' @inheritParams tip
 #' @inheritParams tip_icon
-#' @param tag TODO
+#' @param tag A Shiny input tag.
+#' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
+#' @seealso [tip()], [tip_icon()]
+#' @examples
+#' if (interactive()) {
+#'   library(shiny)
+#'   library(shinytip)
+#'
+#'   shinyApp(
+#'     ui = fluidPage(br(),
+#'       tip_input(
+#'         textInput("name", "Name"),
+#'         "Enter your full name as appears on your passport",
+#'         position = "right"
+#'       )
+#'     ),
+#'     server = function(input, output) {}
+#'   )
+#' }
+#'
 #' @export
 tip_input <- function(
     tag,
