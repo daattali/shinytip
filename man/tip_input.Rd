@@ -40,9 +40,9 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
 only show when the tag is clicked.}
 
-\item{animate}{If \code{FALSE}, don't animate the tooltip appearing and disappearing.}
+\item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
 
-\item{pointer}{If \code{FALSE}, don't change the cursor when hovering over the tag.}
+\item{pointer}{If \code{TRUE}, change the cursor when hovering over the tag.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 

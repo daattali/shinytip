@@ -34,8 +34,8 @@
 #' @param size The font size of the tooltip text.
 #' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip will
 #' only show when the tag is clicked.
-#' @param animate If `FALSE`, don't animate the tooltip appearing and disappearing.
-#' @param pointer If `FALSE`, don't change the cursor when hovering over the tag.
+#' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
+#' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @param ... Additional parameters to pass to the tag.
 #' @return A Shiny tag that supports tooltips.
 #' @seealso [tip_input()], [tip_icon()]

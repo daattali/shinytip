@@ -1,0 +1,85 @@
+html, body {
+  font-size: 16px;
+}
+body {
+  padding: 0 20px;
+  background-image: url('maze-white.png');
+  background-color: #fafafa;
+  color: #333;
+}
+
+#header {
+  text-align: center;
+  color: #fdfdfd;
+  padding: 50px 5px 90px;
+  border-bottom: 1px solid #ddd;
+  margin: 0 -35px 30px;
+  clip-path: polygon(0 0,100% 0,100% calc(100% - 3vw),0 100%);
+  background-color: #e64a19;
+  background-image: url('diagonals.png');
+}
+
+#pagetitle {
+  font-size: 5em;
+  line-height: 1.2;
+  margin-bottom: 15px;
+}
+
+#subtitle {
+  font-size: 2em;
+  margin-bottom: 15px;
+  line-height: 1.1;
+}
+
+#subsubtitle {
+  font-size: 1.3em;
+}
+
+#subsubtitle a {
+  color: #fdfdfd;
+  text-decoration: underline;
+}
+
+@media only screen and (max-width: 979px) {
+  #header {
+    padding: 15px 5px 35px;
+  }
+  #pagetitle {
+    font-size: 3em;
+  }
+  #subtitle {
+    font-size: 1.7em;
+  }
+  #subsubtitle {
+    font-size: 1.2em;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  #pagetitle {
+    font-size: 3em;
+  }
+  #subtitle {
+    font-size: 1.5em;
+  }
+  #subsubtitle {
+    font-size: 1.1em;
+  }
+}
+
+#main-row {
+  margin: 4rem 0 5rem;
+  text-align: center;
+}
+
+#tooltip .shinytip {
+  font-size: 2rem;
+  background: #fff;
+  padding: 1rem 3rem;
+  font-weight: bold;
+  border: 1px solid #aaa;
+}
+
+.checkbox label {
+  font-weight: bold;
+}
