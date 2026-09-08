@@ -67,7 +67,15 @@ tip <- function(
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
+  build_tip(
+    tag = tag, content = content, position = position,
+    length = length, bg = bg, fg = fg, size = size, click = click, animate = animate,
+    pointer = pointer, ...
+  )
+}
 
+build_tip <- function(tag, content, position, length, bg, fg, size,
+                      click, animate, pointer, ...) {
   allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
   if (!position %in% allowed_position) {
     stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
@@ -92,6 +100,7 @@ tip <- function(
   if (missing(content) || !nzchar(trimws(content))) {
     stop("tip: Must provide non-empty content", call. = FALSE)
   }
+  check_text(content)
 
   if (is.numeric(size)) {
     size <- paste0(size, "px")
@@ -111,8 +120,13 @@ tip <- function(
     stop("tip: `tag` must not be empty", call. = FALSE)
   }
 
-  if (inherits(tag, "shiny.tag.list") ||
-      (inherits(tag, "shiny.tag") && (tag$name %in% c("img", "input", "i")))) {
+  # balloon.css uses ::before/::after for tooltips, so some elements need to be
+  # wrapped in a div to allow pseudo-elements to work
+  wrap_tags <- c("img", "input", "i")
+  wrapped <- inherits(tag, "shiny.tag.list") ||
+    (inherits(tag, "shiny.tag") && (tag$name %in% wrap_tags))
+
+  if (wrapped) {
     tag <- shiny::div(tag)
     css <- paste0(css, "display: inline-block; ")
   } else if (!inherits(tag, "shiny.tag")) {
@@ -150,17 +164,7 @@ tip <- function(
     )
   }
 
-  tag <- shiny::tagList(
-    tag,
-    htmltools::htmlDependency(
-      name = "balloon-css",
-      version = "1.2.0",
-      package = "shinytip",
-      src = "assets/lib/balloon-1.2.0",
-      stylesheet = "balloon.min.css",
-      head = "<style>.shinytip-hide:before, .shinytip-hide:after { display: none; }</style>"
-    )
-  )
+  tag <- htmltools::attachDependencies(tag, shinytip_dependencies())
   tag
 }
 
@@ -197,12 +201,10 @@ tip_icon <- function(
     pointer = getOption("shinytip.pointer", TRUE),
     solid = getOption("shinytip.solid", FALSE),
     ...) {
-  tip(
-    tag = shiny::icon("question-circle", class = if (solid) "fa-solid"),
-    content = content,
-    position = position, length = length, bg = bg, fg = fg,
-    size = size, click = click, animate = animate, pointer = pointer,
-    ...
+  build_tip(
+    tag = question_icon(solid), content = content,
+    position = position, length = length, bg = bg, fg = fg, size = size,
+    click = click, animate = animate, pointer = pointer, ...
   )
 }
 
@@ -254,22 +256,19 @@ tip_input <- function(
     stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
   }
 
+  icon <- build_tip(
+    tag = question_icon(solid), content = content,
+    position = position, length = length, bg = bg, fg = fg, size = size,
+    click = click, animate = animate, pointer = pointer, ...
+  )
+
   found_label <- FALSE
   for (idx in seq_along(tag$children)) {
     child <- tag$children[[idx]]
     if (child$name == "label" && !is.null(child$children) &&
         length(child$children) > 0 && !is.null(child$children[[1]])) {
       found_label <- TRUE
-      child <- htmltools::tagAppendChild(
-        child,
-        tip_icon(
-          content = content, position = position,
-          length = length, bg = bg, fg = fg,
-          size = size, click = click, animate = animate, pointer = pointer,
-          ...
-        )
-      )
-      tag$children[[idx]] <- child
+      tag$children[[idx]] <- htmltools::tagAppendChild(child, icon)
       break
     }
   }
@@ -277,16 +276,7 @@ tip_input <- function(
     # checkboxes have a different structure since they don't have a typical <label>
     if (is_checkbox(tag)) {
       label <- tag$children[[1]]$children[[1]]
-      label <- htmltools::tagAppendChild(
-        label,
-        tip_icon(
-          content = content, position = position,
-          length = length, bg = bg, fg = fg,
-          size = size, click = click, animate = animate, pointer = pointer,
-          ...
-        )
-      )
-      tag$children[[1]]$children[[1]] <- label
+      tag$children[[1]]$children[[1]] <- htmltools::tagAppendChild(label, icon)
     } else {
       stop("tip_input: `tag` must have a label", call. = FALSE)
     }
