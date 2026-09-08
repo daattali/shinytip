@@ -14,7 +14,7 @@ share <- list(
 ui <- fluidPage(
   shinydisconnect::disconnectMessage2(),
 
-  title = paste0("{shinytip} ", as.character(packageVersion("shinytip"))),
+  title = paste0("{shinytip} ", as.character(utils::packageVersion("shinytip"))),
 
   tags$head(
     tags$link(rel = "stylesheet", href = "style.css"),
