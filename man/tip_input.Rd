@@ -6,7 +6,8 @@
 \usage{
 tip_input(
   tag,
-  content,
+  content = NULL,
+  content_disabled = NULL,
   position = getOption("shinytip.position", "top"),
   length = getOption("shinytip.length", "line"),
   bg = getOption("shinytip.bg", "black"),
@@ -22,7 +23,12 @@ tip_input(
 \arguments{
 \item{tag}{A Shiny input tag.}
 
-\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
+\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
+\code{NULL} if \code{content_disabled} is given, in which case a tooltip is only shown while the input
+is disabled.}
+
+\item{content_disabled}{The text to show in the tooltip while the input is disabled. See the
+\emph{Disabled inputs} section.}
 
 \item{position}{The position of the tooltip in relation to the tag. One of: \code{"top"}, \code{"bottom"},
 \code{"left"}, \code{"right"}, \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}.}
@@ -38,7 +44,9 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 \item{size}{The font size of the tooltip text.}
 
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
-only show when the tag is clicked.}
+only show when the tag is clicked. Ignored when \code{content_disabled} is given without \code{content}.
+On mobile/touch devices that do not support hover, tooltips are always shown on click
+regardless of this parameter.}
 
 \item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
 
@@ -54,6 +62,16 @@ The same input tag, with a question-mark icon in the label that triggers a toolt
 \description{
 Modifies an input's label to include a question-mark icon at the end that has a tooltip.
 }
+\section{Disabled inputs}{
+
+Use \code{content_disabled} to give an input a tooltip that appears when it's disabled,
+which can be used for explaining \emph{why} an input is disabled.\cr\cr
+Providing only \code{content_disabled} without \code{content} results in a tooltip that is shown
+only while the input is disabled. Providing both \code{content} and \code{content_disabled}
+results in a tooltip that swaps its text depending on the input's state.\cr\cr
+Any inputs disabled with \code{shinyjs::disable()} are automatically detected.
+}
+
 \examples{
 if (interactive()) {
   library(shiny)

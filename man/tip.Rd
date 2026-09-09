@@ -6,7 +6,8 @@
 \usage{
 tip(
   tag,
-  content,
+  content = NULL,
+  content_disabled = NULL,
   position = getOption("shinytip.position", "top"),
   length = getOption("shinytip.length", "line"),
   bg = getOption("shinytip.bg", "black"),
@@ -21,7 +22,12 @@ tip(
 \arguments{
 \item{tag}{A Shiny tag, tagList, or plain text to add a tooltip to.}
 
-\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.}
+\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
+\code{NULL} if \code{content_disabled} is given, in which case a tooltip is only shown while the input
+is disabled.}
+
+\item{content_disabled}{The text to show in the tooltip while the input is disabled. See the
+\emph{Disabled inputs} section.}
 
 \item{position}{The position of the tooltip in relation to the tag. One of: \code{"top"}, \code{"bottom"},
 \code{"left"}, \code{"right"}, \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}.}
@@ -37,7 +43,9 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 \item{size}{The font size of the tooltip text.}
 
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
-only show when the tag is clicked.}
+only show when the tag is clicked. Ignored when \code{content_disabled} is given without \code{content}.
+On mobile/touch devices that do not support hover, tooltips are always shown on click
+regardless of this parameter.}
 
 \item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
 
@@ -54,14 +62,24 @@ Tooltips are powered by the project \code{balloon.css}.\cr\cr
 Most parameters can be set globally in order to use a default setting for all tooltips in your
 Shiny app. This can be done by setting an R option with the parameter's name prepended by
 \code{"shinytip."}. For example, to set all tooltips to appear on the right and have a red background,
-use \code{options(shinytip.position = "right", shinytip.bg = "red")}. Only \code{tag} and \code{content} cannot
-be set globally.
+use \code{options(shinytip.position = "right", shinytip.bg = "red")}. Only \code{tag}, \code{content}, and
+\code{content_disabled} cannot be set globally.
 }
 \details{
 Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome), the tag will get
 wrapped in a \verb{<div>}. When adding a tooltip to plain text, the text is wrapped in a \verb{<span>}. In
 all other cases, no additional HTML tags are created.
 }
+\section{Disabled inputs}{
+
+Use \code{content_disabled} to give an input a tooltip that appears when it's disabled,
+which can be used for explaining \emph{why} an input is disabled.\cr\cr
+Providing only \code{content_disabled} without \code{content} results in a tooltip that is shown
+only while the input is disabled. Providing both \code{content} and \code{content_disabled}
+results in a tooltip that swaps its text depending on the input's state.\cr\cr
+Any inputs disabled with \code{shinyjs::disable()} are automatically detected.
+}
+
 \section{Limitations}{
 
 \itemize{
@@ -72,6 +90,7 @@ on the page.
 add a tooltip to an element that already has pseudo-elements, it may not work.
 \item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 is not a supported interaction.
+\item When \code{content_disabled} is provided without \code{content}, then \code{click} is ignored.
 }
 }
 
@@ -84,7 +103,11 @@ if (interactive()) {
     ui = fluidPage(
       tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
       tip(actionButton("btn", "hover me"), "Hello"),
-      tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE)
+      tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE),
+      tip(
+        actionButton("btn3", "can't touch this", disabled = TRUE),
+        content_disabled = "You do not have permission to do this"
+      )
     ),
     server = function(input, output) {}
   )

@@ -5,12 +5,20 @@
 #' Most parameters can be set globally in order to use a default setting for all tooltips in your
 #' Shiny app. This can be done by setting an R option with the parameter's name prepended by
 #' `"shinytip."`. For example, to set all tooltips to appear on the right and have a red background,
-#' use `options(shinytip.position = "right", shinytip.bg = "red")`. Only `tag` and `content` cannot
-#' be set globally.
+#' use `options(shinytip.position = "right", shinytip.bg = "red")`. Only `tag`, `content`, and
+#' `content_disabled` cannot be set globally.
 #'
 #' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome), the tag will get
 #' wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped in a `<span>`. In
 #' all other cases, no additional HTML tags are created.
+#'
+#' @section Disabled inputs:
+#' Use `content_disabled` to give an input a tooltip that appears when it's disabled,
+#' which can be used for explaining *why* an input is disabled.\cr\cr
+#' Providing only `content_disabled` without `content` results in a tooltip that is shown
+#' only while the input is disabled. Providing both `content` and `content_disabled`
+#' results in a tooltip that swaps its text depending on the input's state.\cr\cr
+#' Any inputs disabled with `shinyjs::disable()` are automatically detected.
 #'
 #' @section Limitations:
 #' - The best position for the tooltip cannot be detected automatically.
@@ -22,8 +30,14 @@
 #'
 #' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 #' is not a supported interaction.
+#'
+#' - When `content_disabled` is provided without `content`, then `click` is ignored.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
-#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
+#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
+#' `NULL` if `content_disabled` is given, in which case a tooltip is only shown while the input
+#' is disabled.
+#' @param content_disabled The text to show in the tooltip while the input is disabled. See the
+#' *Disabled inputs* section.
 #' @param position The position of the tooltip in relation to the tag. One of: `"top"`, `"bottom"`,
 #' `"left"`, `"right"`, `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`.
 #' @param length How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
@@ -33,7 +47,9 @@
 #' @param fg Colour ("foreground") of the tooltip text.
 #' @param size The font size of the tooltip text.
 #' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip will
-#' only show when the tag is clicked.
+#' only show when the tag is clicked. Ignored when `content_disabled` is given without `content`.
+#' On mobile/touch devices that do not support hover, tooltips are always shown on click
+#' regardless of this parameter.
 #' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
 #' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @param ... Additional parameters to pass to the tag.
@@ -48,7 +64,11 @@
 #'     ui = fluidPage(
 #'       tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
 #'       tip(actionButton("btn", "hover me"), "Hello"),
-#'       tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE)
+#'       tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE),
+#'       tip(
+#'         actionButton("btn3", "can't touch this", disabled = TRUE),
+#'         content_disabled = "You do not have permission to do this"
+#'       )
 #'     ),
 #'     server = function(input, output) {}
 #'   )
@@ -57,7 +77,8 @@
 #' @export
 tip <- function(
     tag,
-    content,
+    content = NULL,
+    content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
@@ -68,110 +89,17 @@ tip <- function(
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
   build_tip(
-    tag = tag, content = content, position = position,
+    tag = tag, content = content, content_disabled = content_disabled, position = position,
     length = length, bg = bg, fg = fg, size = size, click = click, animate = animate,
-    pointer = pointer, ...
+    pointer = pointer, remote = FALSE, ...
   )
-}
-
-build_tip <- function(tag, content, position, length, bg, fg, size,
-                      click, animate, pointer, ...) {
-  allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
-  if (!position %in% allowed_position) {
-    stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
-  }
-  position <- sub("top", "up", position)
-  position <- sub("bottom", "down", position)
-
-  allowed_length <- c("line", "fit", "s", "m", "l", "xl")
-  if (!length %in% allowed_length) {
-    stop("tip: `length` must be one of: [", toString(allowed_length), "]", call. = FALSE)
-  }
-  if (length == "s") {
-    length <- "small"
-  } else if (length == "m") {
-    length <- "medium"
-  } else if (length == "l") {
-    length <- "large"
-  } else if (length == "xl") {
-    length <- "xlarge"
-  }
-
-  if (missing(content) || !nzchar(trimws(content))) {
-    stop("tip: Must provide non-empty content", call. = FALSE)
-  }
-  check_text(content)
-
-  if (is.numeric(size)) {
-    size <- paste0(size, "px")
-  }
-
-  css <- paste0(
-    "--balloon-color: ", bg, "; ",
-    "--balloon-text-color: ", fg, "; ",
-    "--balloon-font-size: ", size, "; "
-  )
-
-  if (!pointer) {
-    css <- paste0(css, "cursor: inherit; ")
-  }
-
-  if (is.null(tag) || identical(tag, NA) || length(tag) == 0) {
-    stop("tip: `tag` must not be empty", call. = FALSE)
-  }
-
-  # balloon.css uses ::before/::after for tooltips, so some elements need to be
-  # wrapped in a div to allow pseudo-elements to work
-  wrap_tags <- c("img", "input", "i")
-  wrapped <- inherits(tag, "shiny.tag.list") ||
-    (inherits(tag, "shiny.tag") && (tag$name %in% wrap_tags))
-
-  if (wrapped) {
-    tag <- shiny::div(tag)
-    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-inline")
-  } else if (!inherits(tag, "shiny.tag")) {
-    tag <- shiny::span(tag)
-  }
-
-  tag <- shiny::tagAppendAttributes(
-    tag,
-    class = "shinytip",
-    `aria-label` = content,
-    `data-balloon-pos` = position,
-    style = css,
-    ...
-  )
-
-  if (click) {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      class = "shinytip-hide",
-      `data-balloon-visible` = NA,
-      onclick = "this.classList.toggle('shinytip-hide'); return false;"
-    )
-  }
-
-  if (length != "line") {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      `data-balloon-length` = length
-    )
-  }
-  if (!animate) {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      `data-balloon-blunt` = NA
-    )
-  }
-
-  tag <- htmltools::attachDependencies(tag, shinytip_dependencies())
-  tag
 }
 
 #' Create a tooltip icon
 #'
 #' Add a question-mark icon that shows a tooltip when hovered or clicked.
 #' @inheritParams tip
+#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @return A Shiny icon tag that has a tooltip.
 #' @seealso [tip()], [tip_input()]
@@ -201,10 +129,19 @@ tip_icon <- function(
     pointer = getOption("shinytip.pointer", TRUE),
     solid = getOption("shinytip.solid", FALSE),
     ...) {
+  if (missing(content)) {
+    stop("tip_icon: Must provide `content`", call. = FALSE)
+  }
+  if ("content_disabled" %in% names(list(...))) {
+    stop("tip_icon: `content_disabled` is not supported because an icon has no disabled state ",
+         "of its own. Use `tip_input()` to attach the icon to an input's label, or `tip()` to put the ",
+         "tooltip on the input itself.", call. = FALSE)
+  }
+
   build_tip(
-    tag = question_icon(solid), content = content,
+    tag = question_icon(solid), content = content, content_disabled = NULL,
     position = position, length = length, bg = bg, fg = fg, size = size,
-    click = click, animate = animate, pointer = pointer, ...
+    click = click, animate = animate, pointer = pointer, remote = FALSE, ...
   )
 }
 
@@ -213,6 +150,7 @@ tip_icon <- function(
 #' Modifies an input's label to include a question-mark icon at the end that has a tooltip.
 #' @inheritParams tip
 #' @inheritParams tip_icon
+#' @inheritSection tip Disabled inputs
 #' @param tag A Shiny input tag.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
 #' @seealso [tip()], [tip_icon()]
@@ -236,7 +174,8 @@ tip_icon <- function(
 #' @export
 tip_input <- function(
     tag,
-    content,
+    content = NULL,
+    content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
@@ -257,9 +196,10 @@ tip_input <- function(
   }
 
   icon <- build_tip(
-    tag = question_icon(solid), content = content,
+    tag = question_icon(solid), content = content, content_disabled = content_disabled,
     position = position, length = length, bg = bg, fg = fg, size = size,
-    click = click, animate = animate, pointer = pointer, ...
+    click = click, animate = animate, pointer = pointer,
+    remote = !is.null(content_disabled), ...
   )
 
   found_label <- FALSE
@@ -283,4 +223,119 @@ tip_input <- function(
   }
 
   tag
+}
+
+### The actual workhorse of building the tooltip
+build_tip <- function(tag, content, content_disabled, position, length, bg, fg, size,
+                      click, animate, pointer, remote, ...) {
+
+  allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
+  if (!position %in% allowed_position) {
+    stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
+  }
+  position <- sub("top", "up", position)
+  position <- sub("bottom", "down", position)
+
+  allowed_length <- c("line", "fit", "s", "m", "l", "xl")
+  if (!length %in% allowed_length) {
+    stop("tip: `length` must be one of: [", toString(allowed_length), "]", call. = FALSE)
+  }
+  if (length == "s") {
+    length <- "small"
+  } else if (length == "m") {
+    length <- "medium"
+  } else if (length == "l") {
+    length <- "large"
+  } else if (length == "xl") {
+    length <- "xlarge"
+  }
+
+  if (is.null(content) && is.null(content_disabled)) {
+    stop("tip: Must provide `content` or `content_disabled`", call. = FALSE)
+  }
+  check_text(content)
+  check_text(content_disabled)
+
+  only_disabled <- is.null(content)
+  label <- if (only_disabled) content_disabled else content
+
+  if (is.numeric(size)) {
+    size <- paste0(size, "px")
+  }
+
+  css <- paste0(
+    "--balloon-color: ", bg, "; ",
+    "--balloon-text-color: ", fg, "; ",
+    "--balloon-font-size: ", size, "; "
+  )
+
+  if (!pointer) {
+    css <- paste0(css, "cursor: inherit; ")
+  }
+
+  if (is.null(tag) || identical(tag, NA) || length(tag) == 0) {
+    stop("tip: `tag` must not be empty", call. = FALSE)
+  }
+
+  # balloon.css uses ::before/::after for tooltips, so some elements need to be
+  # wrapped in a div to allow pseudo-elements to work
+  wrap_tags <- c("img", "input", "i")
+  wrapped <- inherits(tag, "shiny.tag.list") ||
+    (inherits(tag, "shiny.tag") && (tag$name %in% wrap_tags))
+  if (wrapped) {
+    tag <- shiny::div(tag)
+    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-inline")
+  } else if (!inherits(tag, "shiny.tag")) {
+    tag <- shiny::span(tag)
+  }
+
+  tag <- shiny::tagAppendAttributes(
+    tag,
+    class = "shinytip",
+    `aria-label` = label,
+    `data-balloon-pos` = position,
+    style = css,
+    ...
+  )
+
+  if (remote) {
+    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-remote")
+  }
+
+  if (only_disabled) {
+    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-disabled-only")
+  } else if (!is.null(content_disabled)) {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      class = "shinytip-disabled-swap",
+      `data-shinytip-content-disabled` = content_disabled
+    )
+  }
+
+  # `click` is ignored when `content_disabled` is the only text, because CSS already drives
+  # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and
+  # reopen the tooltip by itself the next time it was disabled
+  if (click && !only_disabled) {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      class = "shinytip-hide",
+      `data-balloon-visible` = NA,
+      onclick = "this.classList.toggle('shinytip-hide'); return false;"
+    )
+  }
+
+  if (length != "line") {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      `data-balloon-length` = length
+    )
+  }
+  if (!animate) {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      `data-balloon-blunt` = NA
+    )
+  }
+
+  htmltools::attachDependencies(tag, shinytip_dependencies(), append = TRUE)
 }

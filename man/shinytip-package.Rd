@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Dean Attali \email{daattali@gmail.com} (\href{https://orcid.org/0000-0002-5645-3493}{ORCID})
   \item Claudio Holanda (Author of balloon.css)
 }
 
