@@ -12,7 +12,7 @@ tip(
   length = getOption("shinytip.length", "line"),
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
-  size = getOption("shinytip.size", "12px"),
+  fontsize = getOption("shinytip.fontsize", "12px"),
   animate = getOption("shinytip.animate", TRUE),
   pointer = getOption("shinytip.pointer", TRUE),
   ...
@@ -39,7 +39,7 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 
 \item{fg}{Colour ("foreground") of the tooltip text.}
 
-\item{size}{The font size of the tooltip text.}
+\item{fontsize}{The font size of the tooltip text.}
 
 \item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
 

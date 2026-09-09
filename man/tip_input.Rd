@@ -12,7 +12,7 @@ tip_input(
   length = getOption("shinytip.length", "line"),
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
-  size = getOption("shinytip.size", "12px"),
+  fontsize = getOption("shinytip.fontsize", "12px"),
   click = getOption("shinytip.click", FALSE),
   animate = getOption("shinytip.animate", TRUE),
   pointer = getOption("shinytip.pointer", TRUE),
@@ -41,7 +41,7 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 
 \item{fg}{Colour ("foreground") of the tooltip text.}
 
-\item{size}{The font size of the tooltip text.}
+\item{fontsize}{The font size of the tooltip text.}
 
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip is only
 shown once the icon is clicked. Ignored when \code{content_disabled} is given without \code{content}.

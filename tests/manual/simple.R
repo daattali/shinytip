@@ -39,7 +39,7 @@ ui <- fluidPage(fluidRow(
       length = "fit",
       animate = FALSE,
       pointer = FALSE,
-      size = 20
+      fontsize = 20
     ), br(),
     tip(
       "custom style",

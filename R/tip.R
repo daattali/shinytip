@@ -43,7 +43,7 @@
 #' `"l"` (large), `"xl"` (extra large).
 #' @param bg Background colour of the tooltip.
 #' @param fg Colour ("foreground") of the tooltip text.
-#' @param size The font size of the tooltip text.
+#' @param fontsize The font size of the tooltip text.
 #' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
 #' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @param ... Additional parameters to pass to the tag.
@@ -76,13 +76,13 @@ tip <- function(
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
-    size = getOption("shinytip.size", "12px"),
+    fontsize = getOption("shinytip.fontsize", "12px"),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    length = length, bg = bg, fg = fg, size = size, click = FALSE, animate = animate,
+    length = length, bg = bg, fg = fg, fontsize = fontsize, click = FALSE, animate = animate,
     pointer = pointer, remote = FALSE, ...
   )
 }
@@ -119,7 +119,7 @@ tip_icon <- function(
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
-    size = getOption("shinytip.size", "12px"),
+    fontsize = getOption("shinytip.fontsize", "12px"),
     click = getOption("shinytip.click", FALSE),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
@@ -136,7 +136,7 @@ tip_icon <- function(
 
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
-    position = position, length = length, bg = bg, fg = fg, size = size,
+    position = position, length = length, bg = bg, fg = fg, fontsize = fontsize,
     click = click, animate = animate, pointer = pointer, remote = FALSE, ...
   )
 }
@@ -176,7 +176,7 @@ tip_input <- function(
     length = getOption("shinytip.length", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
-    size = getOption("shinytip.size", "12px"),
+    fontsize = getOption("shinytip.fontsize", "12px"),
     click = getOption("shinytip.click", FALSE),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
@@ -193,7 +193,7 @@ tip_input <- function(
 
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
-    position = position, length = length, bg = bg, fg = fg, size = size,
+    position = position, length = length, bg = bg, fg = fg, fontsize = fontsize,
     click = click, animate = animate, pointer = pointer,
     remote = !is.null(content_disabled), ...
   )
@@ -222,7 +222,7 @@ tip_input <- function(
 }
 
 ### The actual workhorse of building the tooltip
-build_tip <- function(tag, content, content_disabled, position, length, bg, fg, size,
+build_tip <- function(tag, content, content_disabled, position, length, bg, fg, fontsize,
                       click, animate, pointer, remote, ...) {
 
   allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
@@ -255,14 +255,14 @@ build_tip <- function(tag, content, content_disabled, position, length, bg, fg, 
   only_disabled <- is.null(content)
   label <- if (only_disabled) content_disabled else content
 
-  if (is.numeric(size)) {
-    size <- paste0(size, "px")
+  if (is.numeric(fontsize)) {
+    fontsize <- paste0(fontsize, "px")
   }
 
   css <- paste0(
     "--balloon-color: ", bg, "; ",
     "--balloon-text-color: ", fg, "; ",
-    "--balloon-font-size: ", size, "; "
+    "--balloon-font-size: ", fontsize, "; "
   )
 
   if (!pointer) {

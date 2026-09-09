@@ -74,7 +74,7 @@ ui <- fluidPage(
       4,
       colourpicker::colourInput("bg", "Background", "black"),
       colourpicker::colourInput("fg", "Text colour", "white"),
-      numericInput("size", "Text size", 16),
+      numericInput("fontsize", "Text size", 16),
     ),
     column(
       4,
@@ -100,7 +100,7 @@ server <- function(input, output, session) {
       '  length = "', input$length, '",\n',
       '  bg = "', input$bg, '",\n',
       '  fg = "', input$fg, '",\n',
-      '  size = ', input$size, ',\n',
+      '  fontsize = ', input$fontsize, ',\n',
       '  animate = ', input$animate, ',\n',
       '  pointer = ', input$pointer, '\n',
       ')'

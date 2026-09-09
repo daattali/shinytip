@@ -6,7 +6,7 @@ options(
   "shinytip.length" = "m",
   "shinytip.bg" = "black",
   "shinytip.fg" = "green",
-  "shinytip.size" = 20,
+  "shinytip.fontsize" = 20,
   "shinytip.animate" = FALSE,
   "shinytip.pointer" = FALSE
 )
@@ -23,7 +23,7 @@ ui <- fluidPage(
     sample_text,
     fg = "white",
     bg = "red",
-    size = 30
+    fontsize = 30
   )
 )
 server <- function(input, output, session) {
