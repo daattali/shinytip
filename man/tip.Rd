@@ -13,7 +13,6 @@ tip(
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
   size = getOption("shinytip.size", "12px"),
-  click = getOption("shinytip.click", FALSE),
   animate = getOption("shinytip.animate", TRUE),
   pointer = getOption("shinytip.pointer", TRUE),
   ...
@@ -41,11 +40,6 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 \item{fg}{Colour ("foreground") of the tooltip text.}
 
 \item{size}{The font size of the tooltip text.}
-
-\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
-only show when the tag is clicked. Ignored when \code{content_disabled} is given without \code{content}.
-On mobile/touch devices that do not support hover, tooltips are always shown on click
-regardless of this parameter.}
 
 \item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
 
@@ -90,7 +84,6 @@ on the page.
 add a tooltip to an element that already has pseudo-elements, it may not work.
 \item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 is not a supported interaction.
-\item When \code{content_disabled} is provided without \code{content}, then \code{click} is ignored.
 }
 }
 
@@ -103,7 +96,6 @@ if (interactive()) {
     ui = fluidPage(
       tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
       tip(actionButton("btn", "hover me"), "Hello"),
-      tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE),
       tip(
         actionButton("btn3", "can't touch this", disabled = TRUE),
         content_disabled = "You do not have permission to do this"

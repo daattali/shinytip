@@ -54,10 +54,11 @@ test_that("tip_input() works on checkboxes, which have no <label> of their own",
 })
 
 test_that("click is ignored when content_disabled is the only text", {
-  direct <- tip_tag(shiny::textInput("test", "test"), content = "hello", content_disabled = "why not", click = TRUE)
+  direct <- as.character(tip_icon(content = "hello", click = TRUE))
   expect_match(direct, "onclick")
-
-  direct <- tip_tag(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
+  direct <- as.character(
+    tip_input(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
+  )
   expect_false(grepl("onclick", direct))
 
   remote <- as.character(

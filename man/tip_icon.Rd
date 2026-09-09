@@ -34,8 +34,8 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 
 \item{size}{The font size of the tooltip text.}
 
-\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip will
-only show when the tag is clicked. Ignored when \code{content_disabled} is given without \code{content}.
+\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip is only
+shown once the icon is clicked. Ignored when \code{content_disabled} is given without \code{content}.
 On mobile/touch devices that do not support hover, tooltips are always shown on click
 regardless of this parameter.}
 

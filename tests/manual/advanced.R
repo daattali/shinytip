@@ -47,13 +47,12 @@ ui <- fluidPage(fluidRow(
         position = "left"
       ),
     ),
-    "The following plot needs to be clicked",
+    "The following plot is spinner wrapped",
     shinytip::tip(
       shinycssloaders::withSpinner(
         plotOutput("plot3", height = "200")
       ),
-      "This plot is spinner wrapped in tip",
-      click = TRUE
+      "This plot is spinner wrapped in tip"
     )
   )
 ))

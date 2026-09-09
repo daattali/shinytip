@@ -30,8 +30,6 @@
 #'
 #' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 #' is not a supported interaction.
-#'
-#' - When `content_disabled` is provided without `content`, then `click` is ignored.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
 #' `NULL` if `content_disabled` is given, in which case a tooltip is only shown while the input
@@ -46,10 +44,6 @@
 #' @param bg Background colour of the tooltip.
 #' @param fg Colour ("foreground") of the tooltip text.
 #' @param size The font size of the tooltip text.
-#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip will
-#' only show when the tag is clicked. Ignored when `content_disabled` is given without `content`.
-#' On mobile/touch devices that do not support hover, tooltips are always shown on click
-#' regardless of this parameter.
 #' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
 #' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @param ... Additional parameters to pass to the tag.
@@ -64,7 +58,6 @@
 #'     ui = fluidPage(
 #'       tip("hover over me", "a tooltip", position = "right"), br(), br(), br(),
 #'       tip(actionButton("btn", "hover me"), "Hello"),
-#'       tip(actionButton("btn2", "click me"), "Hello again!", click = TRUE),
 #'       tip(
 #'         actionButton("btn3", "can't touch this", disabled = TRUE),
 #'         content_disabled = "You do not have permission to do this"
@@ -84,13 +77,12 @@ tip <- function(
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
     size = getOption("shinytip.size", "12px"),
-    click = getOption("shinytip.click", FALSE),
     animate = getOption("shinytip.animate", TRUE),
     pointer = getOption("shinytip.pointer", TRUE),
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    length = length, bg = bg, fg = fg, size = size, click = click, animate = animate,
+    length = length, bg = bg, fg = fg, size = size, click = FALSE, animate = animate,
     pointer = pointer, remote = FALSE, ...
   )
 }
@@ -100,6 +92,10 @@ tip <- function(
 #' Add a question-mark icon that shows a tooltip when hovered or clicked.
 #' @inheritParams tip
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
+#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
+#' shown once the icon is clicked. Ignored when `content_disabled` is given without `content`.
+#' On mobile/touch devices that do not support hover, tooltips are always shown on click
+#' regardless of this parameter.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @return A Shiny icon tag that has a tooltip.
 #' @seealso [tip()], [tip_input()]

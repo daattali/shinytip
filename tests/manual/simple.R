@@ -42,9 +42,8 @@ ui <- fluidPage(fluidRow(
       size = 20
     ), br(),
     tip(
-      "require click, custom style",
+      "custom style",
       sample_text,
-      click = TRUE,
       style = "font-size: 2rem;"
     ), br(),
     tip(

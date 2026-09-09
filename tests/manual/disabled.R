@@ -39,23 +39,15 @@ ui <- fluidPage(
     tip_input(selectInput("sel2", "A select input", c("a", "b")), "Pick one", "Nothing to pick yet"),
     hr(),
 
-    h4("Both texts with click = TRUE, which is kept: click the input to open the tooltip"),
-    tip(
+    h4("Both texts with click = TRUE: click the icon to open the tooltip, and the text swaps"),
+    tip_input(
       textInput("txt8", "A text input"),
       "Type your name", "You can't type right now",
       click = TRUE
     ),
     hr(),
 
-    h4("click = TRUE is ignored here, so these behave like the hover ones above"),
-    tip(
-      textInput("txt6", "A text input"),
-      content_disabled = "The text input is disabled",
-      click = TRUE
-    ),
-    hr(),
-
-    h4("tip_input() with click = TRUE, likewise ignored"),
+    h4("tip_input() with click = TRUE, ignored because there is no enabled-state text"),
     tip_input(
       textInput("txt7", "A text input"),
       content_disabled = "The text input is disabled",
@@ -78,7 +70,7 @@ server <- function(input, output, session) {
   observeEvent(input$toggle, {
     disabled(!disabled())
     inputs <- c("btn", "txt", "sel", "sld", "chk", "txt2", "btn2",
-                "txt3", "chk2", "txt4", "sel2", "txt8", "txt6", "txt7", "btn3", "txt5")
+                "txt3", "chk2", "txt4", "sel2", "txt8", "txt7", "btn3", "txt5")
     if (disabled()) {
       lapply(inputs, shinyjs::disable)
       shinyjs::addClass("text", "shinytip-disabled")

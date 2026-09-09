@@ -78,7 +78,6 @@ ui <- fluidPage(
     ),
     column(
       4,
-      checkboxInput("click", "Trigger on click", FALSE),
       checkboxInput("animate", "Allow animation", TRUE),
       checkboxInput("pointer", "Change cursor on hover", TRUE)
     )
@@ -92,7 +91,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   code <- reactive({
-    text <- if (input$click) "Click me!" else "Hover me!"
+    text <- "Hover me!"
     code <- paste0(
       'shinytip::tip(\n',
       '  "', text, '",\n',
@@ -102,7 +101,6 @@ server <- function(input, output, session) {
       '  bg = "', input$bg, '",\n',
       '  fg = "', input$fg, '",\n',
       '  size = ', input$size, ',\n',
-      '  click = ', input$click, ',\n',
       '  animate = ', input$animate, ',\n',
       '  pointer = ', input$pointer, ',\n',
       ')'
