@@ -62,11 +62,13 @@ ui <- fluidPage(
       4,
       shinytip::tip_input(
         textInput("content", "Text", "Hello there 👋 I'm a tooltip from {shinytip}"),
-        "The text can include emojis but not HTML"
+        "The text can include emojis but not HTML",
+        position = "top-left"
       ),
       shinytip::tip_input(
         selectInput("position", "Position", allowed_positions),
-        "Tooltip position relative to the tag"
+        "Tooltip position relative to the tag",
+        position = "top-left"
       ),
       selectInput("width", "Width", c("line", "fit", "s", "m", "l", "xl")),
     ),
@@ -78,6 +80,12 @@ ui <- fluidPage(
     ),
     column(
       4,
+      shinytip::tip_input(
+        textInput("content_disabled", "Disabled text", ""),
+        "Shown only while the button is disabled"
+      ),
+      checkboxInput("disabled", "Disable the button", FALSE),
+      br(),
       checkboxInput("animate", "Allow animation", TRUE),
       checkboxInput("pointer", "Change cursor on hover", TRUE)
     )
@@ -91,11 +99,23 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   code <- reactive({
-    text <- "Hover me!"
+    if (nzchar(trimws(input$content))) {
+      content <- paste0('  content = "', trimws(input$content), '",\n')
+    } else {
+      content <- ""
+    }
+    if (nzchar(trimws(input$content_disabled))) {
+      content_disabled <- paste0('  content_disabled = "', trimws(input$content_disabled), '",\n')
+    } else {
+      content_disabled <- ""
+    }
+    disabled <- if (input$disabled) ", disabled = TRUE" else ""
+
     code <- paste0(
       'shinytip::tip(\n',
-      '  "', text, '",\n',
-      '  content = "', input$content, '",\n',
+      '  actionButton("test", "Hover me!"', disabled, '),\n',
+      content,
+      content_disabled,
       '  position = "', input$position, '",\n',
       '  width = "', input$width, '",\n',
       '  bg = "', input$bg, '",\n',
@@ -108,7 +128,8 @@ server <- function(input, output, session) {
   })
 
   output$code <- renderText({
-    code()
+    clean_code <- sub(", disabled = TRUE", "", code(), fixed = TRUE)
+    clean_code
   })
 
   output$tooltip <- renderUI({
