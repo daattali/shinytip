@@ -102,7 +102,7 @@ server <- function(input, output, session) {
       '  fg = "', input$fg, '",\n',
       '  size = ', input$size, ',\n',
       '  animate = ', input$animate, ',\n',
-      '  pointer = ', input$pointer, ',\n',
+      '  pointer = ', input$pointer, '\n',
       ')'
     )
   })
