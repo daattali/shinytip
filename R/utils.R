@@ -40,7 +40,7 @@ is_checkbox <- function(tag) {
 check_text <- function(x) {
   if (is.null(x)) return()
   if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(trimws(x))) {
-    stop("tip: `content` must be a single non-empty string", call. = FALSE)
+    stop("tip: `content` and `content_disabled` must be single non-empty strings", call. = FALSE)
   }
 }
 

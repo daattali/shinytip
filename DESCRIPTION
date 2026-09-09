@@ -27,9 +27,10 @@ Suggests:
   shinyalert,
   shinycssloaders,
   shinydisconnect,
+  shinyjs,
   testthat (>= 3.0.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

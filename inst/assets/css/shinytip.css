@@ -8,3 +8,20 @@
 .shinytip-hide:after {
   display: none;
 }
+
+/* Support tooltips on disabled state */
+.shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
+.shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {
+  display: none;
+}
+.shiny-input-container:not(.shinytip-disabled):not(:has(:disabled, .shinytip-disabled)) .shinytip-remote.shinytip-disabled-only {
+  display: none;
+}
+.shinytip-disabled-swap:not(.shinytip-remote):is(:disabled, .shinytip-disabled):after,
+.shinytip-disabled-swap:not(.shinytip-remote):has(:disabled, .shinytip-disabled):after {
+  content: attr(data-shinytip-content-disabled);
+}
+.shiny-input-container.shinytip-disabled .shinytip-remote.shinytip-disabled-swap:after,
+.shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote.shinytip-disabled-swap:after {
+  content: attr(data-shinytip-content-disabled);
+}
