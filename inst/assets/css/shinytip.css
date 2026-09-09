@@ -9,6 +9,11 @@
   display: none;
 }
 
+/* Read the tooltip from our own data-shinytip-label attribute, not from aria-label */
+.shinytip[aria-label][data-balloon-pos]:after {
+  content: attr(data-shinytip-label);
+}
+
 /* Support tooltips on disabled state */
 .shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
 .shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {

@@ -17,20 +17,26 @@ test_that("tooltip text must be a single non-empty string", {
 
 test_that("tip() without content_disabled is unchanged", {
   html <- tip_tag(shiny::div(), "hello")
-  expect_match(html, 'aria-label="hello"')
+  expect_match(html, 'data-shinytip-label="hello"')
   expect_false(grepl("shinytip-disabled-only|shinytip-disabled-swap|data-shinytip-content-disabled", html))
+})
+
+test_that("tip() empties aria-label so it never overrides an element's accessible name", {
+  html <- tip_tag(shiny::actionButton("b", "Save"), "Saves your work")
+  expect_match(html, 'aria-label=""')
+  expect_match(html, 'data-shinytip-label="Saves your work"')
 })
 
 test_that("tip() with only content_disabled shows the disabled text", {
   html <- tip_tag(shiny::div(), content_disabled = "why not")
-  expect_match(html, 'aria-label="why not"')
+  expect_match(html, 'data-shinytip-label="why not"')
   expect_match(html, "shinytip-disabled-only")
   expect_false(grepl("data-shinytip-content-disabled|shinytip-disabled-swap\"", html))
 })
 
 test_that("tip() with both texts keeps each in its own attribute", {
   html <- tip_tag(shiny::div(), "hello", "why not")
-  expect_match(html, 'aria-label="hello"')
+  expect_match(html, 'data-shinytip-label="hello"')
   expect_match(html, 'data-shinytip-content-disabled="why not"')
   expect_match(html, "shinytip-disabled-swap")
   expect_false(grepl("shinytip-disabled-only", html))

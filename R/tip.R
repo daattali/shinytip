@@ -285,10 +285,14 @@ build_tip <- function(tag, content, content_disabled, position, length, bg, fg, 
     tag <- shiny::span(tag)
   }
 
+  # An empty `aria-label` is kept so that balloon.css works, but the actual tooltip
+  # text comes from `data-shinytip-label`. This is done so that we don't override
+  # the accessible name of the element.
   tag <- shiny::tagAppendAttributes(
     tag,
     class = "shinytip",
-    `aria-label` = label,
+    `aria-label` = "",
+    `data-shinytip-label` = label,
     `data-balloon-pos` = position,
     style = css,
     ...
