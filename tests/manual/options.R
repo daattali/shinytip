@@ -2,9 +2,9 @@ library(shiny)
 library(shinytip)
 
 options(
-  "shinytip.position" = "right",
+  "shinytip.position" = "bottom-right",
   "shinytip.length" = "m",
-  "shinytip.bg" = "brown",
+  "shinytip.bg" = "black",
   "shinytip.fg" = "green",
   "shinytip.size" = 20,
   "shinytip.click" = TRUE,
@@ -16,14 +16,15 @@ sample_text <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 ui <- fluidPage(
   tip(
-    "default tip",
+    "default tip (requires a click)",
     sample_text
-  ),
+  ), br(),
   tip(
     "blue tip on bottom",
     sample_text,
-    position = "bottom",
-    fg = "blue",
+    position = "bottom-left",
+    fg = "white",
+    bg = "red",
     click = FALSE
   )
 )
