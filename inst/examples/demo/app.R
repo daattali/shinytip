@@ -68,7 +68,7 @@ ui <- fluidPage(
         selectInput("position", "Position", allowed_positions),
         "Tooltip position relative to the tag"
       ),
-      selectInput("length", "Length", c("line", "fit", "s", "m", "l", "xl")),
+      selectInput("width", "Width", c("line", "fit", "s", "m", "l", "xl")),
     ),
     column(
       4,
@@ -97,7 +97,7 @@ server <- function(input, output, session) {
       '  "', text, '",\n',
       '  content = "', input$content, '",\n',
       '  position = "', input$position, '",\n',
-      '  length = "', input$length, '",\n',
+      '  width = "', input$width, '",\n',
       '  bg = "', input$bg, '",\n',
       '  fg = "', input$fg, '",\n',
       '  fontsize = ', input$fontsize, ',\n',

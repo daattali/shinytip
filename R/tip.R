@@ -38,7 +38,7 @@
 #' *Disabled inputs* section.
 #' @param position The position of the tooltip in relation to the tag. One of: `"top"`, `"bottom"`,
 #' `"left"`, `"right"`, `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`.
-#' @param length How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
+#' @param width How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
 #' line), `"fit"` (the tooltip should have the same width as the tag), `"s"` (small), `"m"` (medium),
 #' `"l"` (large), `"xl"` (extra large).
 #' @param bg Background colour of the tooltip.
@@ -73,7 +73,7 @@ tip <- function(
     content = NULL,
     content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
-    length = getOption("shinytip.length", "line"),
+    width = getOption("shinytip.width", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
     fontsize = getOption("shinytip.fontsize", "12px"),
@@ -82,7 +82,7 @@ tip <- function(
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    length = length, bg = bg, fg = fg, fontsize = fontsize, click = FALSE, animate = animate,
+    width = width, bg = bg, fg = fg, fontsize = fontsize, click = FALSE, animate = animate,
     pointer = pointer, remote = FALSE, ...
   )
 }
@@ -116,7 +116,7 @@ tip <- function(
 tip_icon <- function(
     content,
     position = getOption("shinytip.position", "top"),
-    length = getOption("shinytip.length", "line"),
+    width = getOption("shinytip.width", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
     fontsize = getOption("shinytip.fontsize", "12px"),
@@ -136,7 +136,7 @@ tip_icon <- function(
 
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
-    position = position, length = length, bg = bg, fg = fg, fontsize = fontsize,
+    position = position, width = width, bg = bg, fg = fg, fontsize = fontsize,
     click = click, animate = animate, pointer = pointer, remote = FALSE, ...
   )
 }
@@ -173,7 +173,7 @@ tip_input <- function(
     content = NULL,
     content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
-    length = getOption("shinytip.length", "line"),
+    width = getOption("shinytip.width", "line"),
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
     fontsize = getOption("shinytip.fontsize", "12px"),
@@ -193,7 +193,7 @@ tip_input <- function(
 
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
-    position = position, length = length, bg = bg, fg = fg, fontsize = fontsize,
+    position = position, width = width, bg = bg, fg = fg, fontsize = fontsize,
     click = click, animate = animate, pointer = pointer,
     remote = !is.null(content_disabled), ...
   )
@@ -222,7 +222,7 @@ tip_input <- function(
 }
 
 ### The actual workhorse of building the tooltip
-build_tip <- function(tag, content, content_disabled, position, length, bg, fg, fontsize,
+build_tip <- function(tag, content, content_disabled, position, width, bg, fg, fontsize,
                       click, animate, pointer, remote, ...) {
 
   allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
@@ -232,18 +232,18 @@ build_tip <- function(tag, content, content_disabled, position, length, bg, fg, 
   position <- sub("top", "up", position)
   position <- sub("bottom", "down", position)
 
-  allowed_length <- c("line", "fit", "s", "m", "l", "xl")
-  if (!length %in% allowed_length) {
-    stop("tip: `length` must be one of: [", toString(allowed_length), "]", call. = FALSE)
+  allowed_width <- c("line", "fit", "s", "m", "l", "xl")
+  if (!width %in% allowed_width) {
+    stop("tip: `width` must be one of: [", toString(allowed_width), "]", call. = FALSE)
   }
-  if (length == "s") {
-    length <- "small"
-  } else if (length == "m") {
-    length <- "medium"
-  } else if (length == "l") {
-    length <- "large"
-  } else if (length == "xl") {
-    length <- "xlarge"
+  if (width == "s") {
+    width <- "small"
+  } else if (width == "m") {
+    width <- "medium"
+  } else if (width == "l") {
+    width <- "large"
+  } else if (width == "xl") {
+    width <- "xlarge"
   }
 
   if (is.null(content) && is.null(content_disabled)) {
@@ -324,10 +324,10 @@ build_tip <- function(tag, content, content_disabled, position, length, bg, fg, 
     )
   }
 
-  if (length != "line") {
+  if (width != "line") {
     tag <- shiny::tagAppendAttributes(
       tag,
-      `data-balloon-length` = length
+      `data-balloon-length` = width
     )
   }
   if (!animate) {

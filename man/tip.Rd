@@ -9,7 +9,7 @@ tip(
   content = NULL,
   content_disabled = NULL,
   position = getOption("shinytip.position", "top"),
-  length = getOption("shinytip.length", "line"),
+  width = getOption("shinytip.width", "line"),
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
   fontsize = getOption("shinytip.fontsize", "12px"),
@@ -31,7 +31,7 @@ is disabled.}
 \item{position}{The position of the tooltip in relation to the tag. One of: \code{"top"}, \code{"bottom"},
 \code{"left"}, \code{"right"}, \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}.}
 
-\item{length}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
+\item{width}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
 line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
 \code{"l"} (large), \code{"xl"} (extra large).}
 

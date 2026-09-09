@@ -3,7 +3,7 @@ library(shinytip)
 
 options(
   "shinytip.position" = "bottom-left",
-  "shinytip.length" = "m",
+  "shinytip.width" = "m",
   "shinytip.bg" = "black",
   "shinytip.fg" = "green",
   "shinytip.fontsize" = 20,
