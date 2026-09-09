@@ -49,20 +49,23 @@ question_icon <- function(solid) {
 }
 
 shinytip_dependencies <- function() {
-  list(
-    htmltools::htmlDependency(
-      name = "balloon-css",
-      version = "1.2.0",
-      package = "shinytip",
-      src = "assets/lib/balloon-1.2.0",
-      stylesheet = "balloon.min.css"
-    ),
-    htmltools::htmlDependency(
-      name = "shinytip",
-      version = as.character(utils::packageVersion("shinytip")),
-      package = "shinytip",
-      src = "assets/css",
-      stylesheet = "shinytip.css"
+  if (is.null(.shinytipglobals$deps)) {
+    .shinytipglobals$deps <- list(
+      htmltools::htmlDependency(
+        name = "balloon-css",
+        version = "1.2.0",
+        package = "shinytip",
+        src = "assets/lib/balloon-1.2.0",
+        stylesheet = "balloon.min.css"
+      ),
+      htmltools::htmlDependency(
+        name = "shinytip",
+        version = as.character(utils::packageVersion("shinytip")),
+        package = "shinytip",
+        src = "assets/css",
+        stylesheet = "shinytip.css"
+      )
     )
-  )
+  }
+  .shinytipglobals$deps
 }
