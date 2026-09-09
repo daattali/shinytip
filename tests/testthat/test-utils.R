@@ -14,7 +14,7 @@ test_that("has_class works", {
 })
 
 test_that("is_checkbox works", {
-  expect_error(is_checkbox())
+  expect_false(is_checkbox())
   expect_false(is_checkbox("foo"))
   expect_false(is_checkbox(htmltools::div()))
   expect_false(is_checkbox(shiny::textInput("test", "test")))

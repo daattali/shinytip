@@ -25,7 +25,7 @@ is_checkbox <- function(tag) {
     if (!has_class(tag, "shiny-input-container")) {
       return(FALSE)
     }
-    if (length(tags$children) == 0) {
+    if (length(tag$children) == 0) {
       return(FALSE)
     }
     if (!tag$children[[1]]$name == "div") {

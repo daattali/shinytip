@@ -1,6 +1,6 @@
 #' Run shinytip example
 #'
-#' Launch an example Shiny app that shows how to use {shinytip}.\cr\cr
+#' Launch an example Shiny app that shows how to use \{shinytip\}.\cr\cr
 #' The demo app is also
 #' \href{https://daattali.com/shiny/shinytip-demo/}{available online}
 #' to experiment with.
