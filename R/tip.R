@@ -30,6 +30,9 @@
 #'
 #' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 #' is not a supported interaction.
+#'
+#' - If an element loses its opacity when disabled, then the tooltip will also lose its
+#' opacity when the element is disabled. This commonly affects tooltips on disabled `actionButton()`.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
 #' Use `\n` to force a new line. Can be `NULL` if `content_disabled` is given, in which case

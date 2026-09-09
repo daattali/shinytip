@@ -84,6 +84,8 @@ on the page.
 add a tooltip to an element that already has pseudo-elements, it may not work.
 \item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 is not a supported interaction.
+\item If an element loses its opacity when disabled, then the tooltip will also lose its
+opacity when the element is disabled. This commonly affects tooltips on disabled \code{actionButton()}.
 }
 }
 
