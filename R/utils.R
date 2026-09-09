@@ -18,23 +18,28 @@ has_class <- function(tag, class) {
 }
 
 is_checkbox <- function(tag) {
-  if (!inherits(tag, "shiny.tag")) {
-    return(FALSE)
-  }
+  is_checkbox <- tryCatch({
+    if (!inherits(tag, "shiny.tag")) {
+      return(FALSE)
+    }
+    if (!has_class(tag, "shiny-input-container")) {
+      return(FALSE)
+    }
+    if (length(tags$children) == 0) {
+      return(FALSE)
+    }
+    if (!tag$children[[1]]$name == "div") {
+      return(FALSE)
+    }
+    if (!has_class(tag$children[[1]], "checkbox")) {
+      return(FALSE)
+    }
 
-  if (!has_class(tag, "shiny-input-container")) {
-    return(FALSE)
-  }
-
-  if (!tag$children[[1]]$name == "div") {
-    return(FALSE)
-  }
-
-  if (!has_class(tag$children[[1]], "checkbox")) {
-    return(FALSE)
-  }
-
-  TRUE
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+  is_checkbox
 }
 
 check_text <- function(x) {

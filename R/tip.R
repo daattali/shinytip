@@ -205,7 +205,7 @@ tip_input <- function(
   found_label <- FALSE
   for (idx in seq_along(tag$children)) {
     child <- tag$children[[idx]]
-    if (child$name == "label" && !is.null(child$children) &&
+    if (inherits(child, "shiny.tag") && child$name == "label" && !is.null(child$children) &&
         length(child$children) > 0 && !is.null(child$children[[1]])) {
       found_label <- TRUE
       tag$children[[idx]] <- htmltools::tagAppendChild(child, icon)
