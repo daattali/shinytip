@@ -21,9 +21,9 @@ tip(
 \arguments{
 \item{tag}{A Shiny tag, tagList, or plain text to add a tooltip to.}
 
-\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
-\code{NULL} if \code{content_disabled} is given, in which case a tooltip is only shown while the input
-is disabled.}
+\item{content}{The text in the tooltip. Can include emojis, but cannot contain HTML.
+Use \verb{\\n} to force a new line. Can be \code{NULL} if \code{content_disabled} is given, in which case
+tooltip is only shown while the input is disabled.}
 
 \item{content_disabled}{The text to show in the tooltip while the input is disabled. See the
 \emph{Disabled inputs} section.}
@@ -60,9 +60,9 @@ use \code{options(shinytip.position = "right", shinytip.bg = "red")}. Only \code
 \code{content_disabled} cannot be set globally.
 }
 \details{
-Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome), the tag will get
-wrapped in a \verb{<div>}. When adding a tooltip to plain text, the text is wrapped in a \verb{<span>}. In
-all other cases, no additional HTML tags are created.
+Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome),
+the tag will get wrapped in a \verb{<div>}. When adding a tooltip to plain text, the text is wrapped
+in a \verb{<span>}. In all other cases, no additional HTML tags are created.
 }
 \section{Disabled inputs}{
 

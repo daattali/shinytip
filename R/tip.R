@@ -8,9 +8,9 @@
 #' use `options(shinytip.position = "right", shinytip.bg = "red")`. Only `tag`, `content`, and
 #' `content_disabled` cannot be set globally.
 #'
-#' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome), the tag will get
-#' wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped in a `<span>`. In
-#' all other cases, no additional HTML tags are created.
+#' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome),
+#' the tag will get wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped
+#' in a `<span>`. In all other cases, no additional HTML tags are created.
 #'
 #' @section Disabled inputs:
 #' Use `content_disabled` to give an input a tooltip that appears when it's disabled,
@@ -31,9 +31,9 @@
 #' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 #' is not a supported interaction.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
-#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML. Can be
-#' `NULL` if `content_disabled` is given, in which case a tooltip is only shown while the input
-#' is disabled.
+#' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
+#' Use `\n` to force a new line. Can be `NULL` if `content_disabled` is given, in which case
+#' tooltip is only shown while the input is disabled.
 #' @param content_disabled The text to show in the tooltip while the input is disabled. See the
 #' *Disabled inputs* section.
 #' @param position The position of the tooltip in relation to the tag. One of: `"top"`, `"bottom"`,
@@ -251,6 +251,8 @@ build_tip <- function(tag, content, content_disabled, position, width, bg, fg, f
   }
   check_text(content)
   check_text(content_disabled)
+  newlines <- (!is.null(content) && grepl("\n", content)) ||
+    (!is.null(content_disabled) && grepl("\n", content_disabled))
 
   only_disabled <- is.null(content)
   label <- if (only_disabled) content_disabled else content
@@ -294,6 +296,7 @@ build_tip <- function(tag, content, content_disabled, position, width, bg, fg, f
     `aria-label` = "",
     `data-shinytip-label` = label,
     `data-balloon-pos` = position,
+    `data-balloon-break` = if (newlines) NA,
     style = css,
     ...
   )
