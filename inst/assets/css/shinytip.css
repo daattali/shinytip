@@ -1,0 +1,10 @@
+/* When wrapping a tooltip in a <div>, don't transform it to full-width element */
+.shinytip-inline {
+  display: inline-block;
+}
+
+/* Used by `click = TRUE` to toggle a tooltip's visibility */
+.shinytip-hide:before,
+.shinytip-hide:after {
+  display: none;
+}

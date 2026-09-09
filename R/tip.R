@@ -128,7 +128,7 @@ build_tip <- function(tag, content, position, length, bg, fg, size,
 
   if (wrapped) {
     tag <- shiny::div(tag)
-    css <- paste0(css, "display: inline-block; ")
+    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-inline")
   } else if (!inherits(tag, "shiny.tag")) {
     tag <- shiny::span(tag)
   }
