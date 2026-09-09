@@ -279,7 +279,7 @@ build_tip <- function(tag, content, content_disabled, position, length, bg, fg, 
 
   # balloon.css uses ::before/::after for tooltips, so some elements need to be
   # wrapped in a div to allow pseudo-elements to work
-  wrap_tags <- c("img", "input", "i")
+  wrap_tags <- c("img", "input", "i", "select", "textarea")
   wrapped <- inherits(tag, "shiny.tag.list") ||
     (inherits(tag, "shiny.tag") && (tag$name %in% wrap_tags))
   if (wrapped) {
