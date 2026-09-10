@@ -10,12 +10,8 @@ tip_input(
   content_disabled = NULL,
   position = getOption("shinytip.position", "top"),
   width = getOption("shinytip.width", "line"),
-  bg = getOption("shinytip.bg", "black"),
-  fg = getOption("shinytip.fg", "white"),
-  fontsize = getOption("shinytip.fontsize", "12px"),
+  theme = tip_theme(),
   click = getOption("shinytip.click", FALSE),
-  animate = getOption("shinytip.animate", TRUE),
-  pointer = getOption("shinytip.pointer", TRUE),
   solid = getOption("shinytip.solid", FALSE),
   ...
 )
@@ -37,24 +33,17 @@ tooltip is only shown while the input is disabled.}
 line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
 \code{"l"} (large), \code{"xl"} (extra large).}
 
-\item{bg}{Background colour of the tooltip.}
-
-\item{fg}{Colour ("foreground") of the tooltip text.}
-
-\item{fontsize}{The font size of the tooltip text.}
+\item{theme}{A \code{\link[=tip_theme]{tip_theme()}} object holding the tooltip's appearance (colours, font size,
+animation, cursor).}
 
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip is only
 shown once the icon is clicked. Ignored when \code{content_disabled} is given without \code{content}.
 On mobile/touch devices that do not support hover, tooltips are always shown on click
 regardless of this parameter.}
 
-\item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
-
-\item{pointer}{If \code{TRUE}, change the cursor when hovering over the tag.}
-
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 
-\item{...}{Additional parameters to pass to the tag.}
+\item{...}{Additional attributes to pass to the question-mark icon added to the label.}
 }
 \value{
 The same input tag, with a question-mark icon in the label that triggers a tooltip.
@@ -91,5 +80,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}
 }

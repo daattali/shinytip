@@ -1,3 +1,14 @@
+# The valid `position` and `width` values, each mapped to the value balloon.css expects
+shinytip_positions <- c(
+  "top" = "up", "bottom" = "down", "left" = "left", "right" = "right",
+  "top-left" = "up-left", "top-right" = "up-right",
+  "bottom-left" = "down-left", "bottom-right" = "down-right"
+)
+shinytip_widths <- c(
+  "line" = "line", "fit" = "fit", "s" = "small",
+  "m" = "medium", "l" = "large", "xl" = "xlarge"
+)
+
 has_class <- function(tag, class) {
   if (!inherits(tag, "shiny.tag")) {
     stop("has_class: `tag` must be a shiny tag")

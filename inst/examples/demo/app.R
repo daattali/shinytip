@@ -118,11 +118,13 @@ server <- function(input, output, session) {
       content_disabled,
       '  position = "', input$position, '",\n',
       '  width = "', input$width, '",\n',
-      '  bg = "', input$bg, '",\n',
-      '  fg = "', input$fg, '",\n',
-      '  fontsize = ', input$fontsize, ',\n',
-      '  animate = ', input$animate, ',\n',
-      '  pointer = ', input$pointer, '\n',
+      '  theme = shinytip::tip_theme(\n',
+      '    bg = "', input$bg, '",\n',
+      '    fg = "', input$fg, '",\n',
+      '    fontsize = ', input$fontsize, ',\n',
+      '    animate = ', input$animate, ',\n',
+      '    pointer = ', input$pointer, '\n',
+      '  )\n',
       ')'
     )
   })

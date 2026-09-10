@@ -6,7 +6,7 @@ ui <- fluidPage(fluidRow(
     width = 3,
     shinytip::tip_icon("This is the explanation", position = "bottom"), br(),
     "This one requires a click",
-    shinytip::tip_icon("Red background", position = "right", bg = "red", click = TRUE),
+    shinytip::tip_icon("Red background", position = "right", theme = shinytip::tip_theme(bg = "red"), click = TRUE),
     shinytip::tip_input(
       textInput("text", "Name"),
       "Enter your full name"

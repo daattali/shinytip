@@ -21,9 +21,7 @@ ui <- fluidPage(
   tip(
     "blue tip on bottom",
     sample_text,
-    fg = "white",
-    bg = "red",
-    fontsize = 30
+    theme = tip_theme(fg = "white", bg = "red", fontsize = 30)
   )
 )
 server <- function(input, output, session) {

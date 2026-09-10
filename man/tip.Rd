@@ -10,11 +10,7 @@ tip(
   content_disabled = NULL,
   position = getOption("shinytip.position", "top"),
   width = getOption("shinytip.width", "line"),
-  bg = getOption("shinytip.bg", "black"),
-  fg = getOption("shinytip.fg", "white"),
-  fontsize = getOption("shinytip.fontsize", "12px"),
-  animate = getOption("shinytip.animate", TRUE),
-  pointer = getOption("shinytip.pointer", TRUE),
+  theme = tip_theme(),
   ...
 )
 }
@@ -35,17 +31,10 @@ tooltip is only shown while the input is disabled.}
 line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
 \code{"l"} (large), \code{"xl"} (extra large).}
 
-\item{bg}{Background colour of the tooltip.}
+\item{theme}{A \code{\link[=tip_theme]{tip_theme()}} object holding the tooltip's appearance (colours, font size,
+animation, cursor).}
 
-\item{fg}{Colour ("foreground") of the tooltip text.}
-
-\item{fontsize}{The font size of the tooltip text.}
-
-\item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
-
-\item{pointer}{If \code{TRUE}, change the cursor when hovering over the tag.}
-
-\item{...}{Additional parameters to pass to the tag.}
+\item{...}{Additional attributes to pass to the tag.}
 }
 \value{
 A Shiny tag that supports tooltips.
@@ -53,11 +42,11 @@ A Shiny tag that supports tooltips.
 \description{
 Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
 Tooltips are powered by the project \code{balloon.css}.\cr\cr
-Most parameters can be set globally in order to use a default setting for all tooltips in your
-Shiny app. This can be done by setting an R option with the parameter's name prepended by
-\code{"shinytip."}. For example, to set all tooltips to appear on the right and have a red background,
-use \code{options(shinytip.position = "right", shinytip.bg = "red")}. Only \code{tag}, \code{content}, and
-\code{content_disabled} cannot be set globally.
+All the theme parameters, along with \code{position} and \code{width}, can be set globally in order to use
+a default setting for all tooltips in your Shiny app. This can be done by setting an R option with
+the parameter's name prepended by \code{"shinytip."}. For example, to set all tooltips to appear on the
+right and have a red background, use \code{options(shinytip.position = "right", shinytip.bg = "red")}.
+Only \code{tag}, \code{content}, and \code{content_disabled} cannot be set globally.
 }
 \details{
 Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome),
@@ -109,5 +98,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_icon]{tip_icon()}}
+\code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}
 }

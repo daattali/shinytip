@@ -94,3 +94,31 @@ test_that("dependencies already on the caller's tag are kept", {
   expect_true("mine" %in% vapply(deps, `[[`, character(1), "name"))
   expect_true("shinytip" %in% vapply(deps, `[[`, character(1), "name"))
 })
+
+test_that("`theme` sets the tooltip appearance", {
+  expect_match(as.character(tip("x", "y", theme = tip_theme(bg = "red"))),
+               "--balloon-color: red", fixed = TRUE)
+  expect_match(as.character(tip("x", "y", theme = tip_theme(fg = "pink", fontsize = 20))),
+               "--balloon-text-color: pink; --balloon-font-size: 20px;", fixed = TRUE)
+})
+
+test_that("`theme` rejects anything that is not a tip_theme() object", {
+  expect_error(tip("x", "y", theme = list(bg = "red")), "tip_theme")
+  expect_error(tip("x", "y", theme = "border: 1px solid red"), "tip_theme")
+  expect_error(tip("x", "y", theme = NULL), "tip_theme")
+})
+
+test_that("a `style` passed through `...` is merged onto the tag, alongside the theme", {
+  html <- as.character(tip("x", "y", theme = tip_theme(bg = "red"), style = "margin: 5px"))
+  # both must end up in the single style attribute of the tag
+  expect_match(html, "--balloon-color: red", fixed = TRUE)
+  expect_match(html, "margin: 5px", fixed = TRUE)
+  expect_length(gregexpr("style=", html, fixed = TRUE)[[1]], 1L)
+
+  # `...` reaches the generated wrapper for tags that get wrapped
+  expect_match(as.character(tip(shiny::img(src = "x.png"), "y", style = "margin: 5px")),
+               "shinytip-inline", fixed = TRUE)
+
+  # for tip_icon()/tip_input() `...` lands on the icon, not the input
+  expect_match(as.character(tip_icon("y", style = "color: gray")), "color: gray", fixed = TRUE)
+})

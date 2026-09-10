@@ -2,11 +2,11 @@
 #'
 #' Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
 #' Tooltips are powered by the project `balloon.css`.\cr\cr
-#' Most parameters can be set globally in order to use a default setting for all tooltips in your
-#' Shiny app. This can be done by setting an R option with the parameter's name prepended by
-#' `"shinytip."`. For example, to set all tooltips to appear on the right and have a red background,
-#' use `options(shinytip.position = "right", shinytip.bg = "red")`. Only `tag`, `content`, and
-#' `content_disabled` cannot be set globally.
+#' All the theme parameters, along with `position` and `width`, can be set globally in order to use
+#' a default setting for all tooltips in your Shiny app. This can be done by setting an R option with
+#' the parameter's name prepended by `"shinytip."`. For example, to set all tooltips to appear on the
+#' right and have a red background, use `options(shinytip.position = "right", shinytip.bg = "red")`.
+#' Only `tag`, `content`, and `content_disabled` cannot be set globally.
 #'
 #' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome),
 #' the tag will get wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped
@@ -44,14 +44,11 @@
 #' @param width How wide should the tooltip be? One of: `"line"` (place the entire tooltip in one
 #' line), `"fit"` (the tooltip should have the same width as the tag), `"s"` (small), `"m"` (medium),
 #' `"l"` (large), `"xl"` (extra large).
-#' @param bg Background colour of the tooltip.
-#' @param fg Colour ("foreground") of the tooltip text.
-#' @param fontsize The font size of the tooltip text.
-#' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
-#' @param pointer If `TRUE`, change the cursor when hovering over the tag.
-#' @param ... Additional parameters to pass to the tag.
+#' @param theme A [tip_theme()] object holding the tooltip's appearance (colours, font size,
+#' animation, cursor).
+#' @param ... Additional attributes to pass to the tag.
 #' @return A Shiny tag that supports tooltips.
-#' @seealso [tip_input()], [tip_icon()]
+#' @seealso [tip_input()], [tip_icon()], [tip_theme()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -77,16 +74,11 @@ tip <- function(
     content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
-    bg = getOption("shinytip.bg", "black"),
-    fg = getOption("shinytip.fg", "white"),
-    fontsize = getOption("shinytip.fontsize", "12px"),
-    animate = getOption("shinytip.animate", TRUE),
-    pointer = getOption("shinytip.pointer", TRUE),
+    theme = tip_theme(),
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, bg = bg, fg = fg, fontsize = fontsize, click = FALSE, animate = animate,
-    pointer = pointer, remote = FALSE, ...
+    width = width, theme = theme, click = FALSE, remote = FALSE, ...
   )
 }
 
@@ -100,8 +92,9 @@ tip <- function(
 #' On mobile/touch devices that do not support hover, tooltips are always shown on click
 #' regardless of this parameter.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
+#' @param ... Additional attributes to pass to the question-mark icon.
 #' @return A Shiny icon tag that has a tooltip.
-#' @seealso [tip()], [tip_input()]
+#' @seealso [tip()], [tip_input()], [tip_theme()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -120,12 +113,8 @@ tip_icon <- function(
     content,
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
-    bg = getOption("shinytip.bg", "black"),
-    fg = getOption("shinytip.fg", "white"),
-    fontsize = getOption("shinytip.fontsize", "12px"),
+    theme = tip_theme(),
     click = getOption("shinytip.click", FALSE),
-    animate = getOption("shinytip.animate", TRUE),
-    pointer = getOption("shinytip.pointer", TRUE),
     solid = getOption("shinytip.solid", FALSE),
     ...) {
   if (missing(content)) {
@@ -139,8 +128,8 @@ tip_icon <- function(
 
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
-    position = position, width = width, bg = bg, fg = fg, fontsize = fontsize,
-    click = click, animate = animate, pointer = pointer, remote = FALSE, ...
+    position = position, width = width, theme = theme,
+    click = click, remote = FALSE, ...
   )
 }
 
@@ -151,8 +140,9 @@ tip_icon <- function(
 #' @inheritParams tip_icon
 #' @inheritSection tip Disabled inputs
 #' @param tag A Shiny input tag.
+#' @param ... Additional attributes to pass to the question-mark icon added to the label.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
-#' @seealso [tip()], [tip_icon()]
+#' @seealso [tip()], [tip_icon()], [tip_theme()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -177,12 +167,8 @@ tip_input <- function(
     content_disabled = NULL,
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
-    bg = getOption("shinytip.bg", "black"),
-    fg = getOption("shinytip.fg", "white"),
-    fontsize = getOption("shinytip.fontsize", "12px"),
+    theme = tip_theme(),
     click = getOption("shinytip.click", FALSE),
-    animate = getOption("shinytip.animate", TRUE),
-    pointer = getOption("shinytip.pointer", TRUE),
     solid = getOption("shinytip.solid", FALSE),
     ...) {
   if (!inherits(tag, "shiny.tag")) {
@@ -196,9 +182,8 @@ tip_input <- function(
 
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
-    position = position, width = width, bg = bg, fg = fg, fontsize = fontsize,
-    click = click, animate = animate, pointer = pointer,
-    remote = !is.null(content_disabled), ...
+    position = position, width = width, theme = theme,
+    click = click, remote = !is.null(content_disabled), ...
   )
 
   found_label <- FALSE
@@ -225,29 +210,26 @@ tip_input <- function(
 }
 
 ### The actual workhorse of building the tooltip
-build_tip <- function(tag, content, content_disabled, position, width, bg, fg, fontsize,
-                      click, animate, pointer, remote, ...) {
+build_tip <- function(tag, content, content_disabled, position, width, theme,
+                      click, remote, ...) {
+  if (!inherits(theme, "shinytip_theme")) {
+    stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
+  }
+  bg <- theme$bg
+  fg <- theme$fg
+  fontsize <- theme$fontsize
+  animate <- theme$animate
+  pointer <- theme$pointer
 
-  allowed_position <- c("top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right")
-  if (!position %in% allowed_position) {
-    stop("tip: `position` must be one of: [", toString(allowed_position), "]", call. = FALSE)
+  if (!position %in% names(shinytip_positions)) {
+    stop("tip: `position` must be one of: [", toString(names(shinytip_positions)), "]", call. = FALSE)
   }
-  position <- sub("top", "up", position)
-  position <- sub("bottom", "down", position)
+  position <- shinytip_positions[[position]]
 
-  allowed_width <- c("line", "fit", "s", "m", "l", "xl")
-  if (!width %in% allowed_width) {
-    stop("tip: `width` must be one of: [", toString(allowed_width), "]", call. = FALSE)
+  if (!width %in% names(shinytip_widths)) {
+    stop("tip: `width` must be one of: [", toString(names(shinytip_widths)), "]", call. = FALSE)
   }
-  if (width == "s") {
-    width <- "small"
-  } else if (width == "m") {
-    width <- "medium"
-  } else if (width == "l") {
-    width <- "large"
-  } else if (width == "xl") {
-    width <- "xlarge"
-  }
+  width <- shinytip_widths[[width]]
 
   if (is.null(content) && is.null(content_disabled)) {
     stop("tip: Must provide `content` or `content_disabled`", call. = FALSE)
@@ -267,12 +249,9 @@ build_tip <- function(tag, content, content_disabled, position, width, bg, fg, f
   css <- paste0(
     "--balloon-color: ", bg, "; ",
     "--balloon-text-color: ", fg, "; ",
-    "--balloon-font-size: ", fontsize, "; "
+    "--balloon-font-size: ", fontsize, ";",
+    if (!pointer) " cursor: inherit;"
   )
-
-  if (!pointer) {
-    css <- paste0(css, "cursor: inherit; ")
-  }
 
   if (is.null(tag) || identical(tag, NA) || length(tag) == 0) {
     stop("tip: `tag` must not be empty", call. = FALSE)
