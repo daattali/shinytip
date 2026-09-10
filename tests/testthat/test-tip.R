@@ -197,7 +197,7 @@ test_that("tip_input() requires a shiny input that has a label", {
 test_that("tip() requires a tag", {
   expect_error(tip(NULL, "y"), "`tag` must not be empty")
   expect_error(tip(list(), "y"), "`tag` must not be empty")
-  expect_error(tip(list(), "y"), NA)
+  expect_error(tip("y", "y"), NA)
 })
 
 test_that("click is only accepted by tip_icon() and tip_input()", {

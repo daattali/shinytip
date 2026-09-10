@@ -7,7 +7,7 @@ share <- list(
   url = "https://daattali.com/shiny/shinytip-demo/",
   source = "https://github.com/daattali/shinytip",
   image = "https://daattali.com/shiny/img/shinytip.png",
-  description = "Simple flexible tootips for Shiny apps",
+  description = "Simple flexible tooltips for Shiny apps",
   twitter_user = "daattali"
 )
 
