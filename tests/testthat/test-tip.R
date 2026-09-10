@@ -110,15 +110,113 @@ test_that("`theme` rejects anything that is not a tip_theme() object", {
 
 test_that("a `style` passed through `...` is merged onto the tag, alongside the theme", {
   html <- as.character(tip("x", "y", theme = tip_theme(bg = "red"), style = "margin: 5px"))
-  # both must end up in the single style attribute of the tag
   expect_match(html, "--balloon-color: red", fixed = TRUE)
   expect_match(html, "margin: 5px", fixed = TRUE)
   expect_length(gregexpr("style=", html, fixed = TRUE)[[1]], 1L)
 
-  # `...` reaches the generated wrapper for tags that get wrapped
   expect_match(as.character(tip(shiny::img(src = "x.png"), "y", style = "margin: 5px")),
                "shinytip-inline", fixed = TRUE)
 
-  # for tip_icon()/tip_input() `...` lands on the icon, not the input
   expect_match(as.character(tip_icon("y", style = "color: gray")), "color: gray", fixed = TRUE)
+})
+
+test_that("position is translated to the balloon.css value", {
+  expect_match(tip_tag("x", "y", position = "top"), 'data-balloon-pos="up"')
+  expect_match(tip_tag("x", "y", position = "bottom"), 'data-balloon-pos="down"')
+  expect_match(tip_tag("x", "y", position = "left"), 'data-balloon-pos="left"')
+  expect_match(tip_tag("x", "y", position = "bottom-left"), 'data-balloon-pos="down-left"')
+  expect_match(tip_tag("x", "y", position = "top-right"), 'data-balloon-pos="up-right"')
+})
+
+test_that("width is translated to the balloon.css value", {
+  expect_match(tip_tag("x", "y", width = "fit"), 'data-balloon-length="fit"')
+  expect_match(tip_tag("x", "y", width = "s"), 'data-balloon-length="small"')
+  expect_match(tip_tag("x", "y", width = "m"), 'data-balloon-length="medium"')
+  expect_match(tip_tag("x", "y", width = "xl"), 'data-balloon-length="xlarge"')
+  expect_false(grepl("data-balloon-length", tip_tag("x", "y", width = "line")))
+})
+
+test_that("position and width must be one of the allowed values", {
+  expect_error(tip("x", "y", position = "up"), "`position` must be one of")
+  expect_error(tip("x", "y", width = "100px"), "`width` must be one of")
+})
+
+test_that("a newline in the tooltip text allows the tooltip to wrap", {
+  expect_match(tip_tag("x", "a\nb"), "data-balloon-break")
+  expect_match(tip_tag("x", content_disabled = "a\nb"), "data-balloon-break")
+  expect_false(grepl("data-balloon-break", tip_tag("x", "a b")))
+})
+
+test_that("animate = FALSE removes the animation", {
+  expect_match(tip_tag("x", "y", theme = tip_theme(animate = FALSE)), "data-balloon-blunt")
+  expect_false(grepl("data-balloon-blunt", tip_tag("x", "y")))
+})
+
+test_that("pointer = FALSE leaves the cursor alone", {
+  expect_match(tip_tag("x", "y", theme = tip_theme(pointer = FALSE)), "cursor: inherit", fixed = TRUE)
+  expect_false(grepl("cursor", tip_tag("x", "y")))
+})
+
+test_that("a numeric fontsize is treated as pixels", {
+  expect_match(tip_tag("x", "y", theme = tip_theme(fontsize = 20)),
+               "--balloon-font-size: 20px", fixed = TRUE)
+  expect_match(tip_tag("x", "y", theme = tip_theme(fontsize = "2rem")),
+               "--balloon-font-size: 2rem", fixed = TRUE)
+})
+
+test_that("elements that cannot have pseudo-elements are wrapped in a div", {
+  wrapped <- list(
+    shiny::img(src = "x.png"), shiny::tags$input(), shiny::icon("star"),
+    shiny::tags$select(), shiny::tags$textarea(), shiny::tagList("a", "b")
+  )
+  for (tag in wrapped) {
+    html <- tip_tag(tag, "y")
+    expect_match(html, "^<div")
+    expect_match(html, "shinytip-inline")
+  }
+  expect_false(grepl("shinytip-inline", tip_tag(shiny::div(), "y")))
+})
+
+test_that("plain text is wrapped in a span", {
+  expect_match(tip_tag("some text", "y"), "^<span")
+  expect_false(grepl("shinytip-inline", tip_tag("some text", "y")))
+})
+
+test_that("tip_icon() requires content and rejects content_disabled", {
+  expect_error(tip_icon(), "Must provide `content`")
+  expect_error(tip_icon("y", content_disabled = "z"), "not supported")
+})
+
+test_that("tip_input() requires a shiny input that has a label", {
+  expect_error(tip_input("x", "y"), "must be a Shiny input tag")
+  expect_error(tip_input(shiny::div(), "y"), "must be a Shiny input tag")
+  expect_error(tip_input(shiny::textInput("test", NULL), "y"), "must have a label")
+  expect_error(tip_input(shiny::textInput("test", "test"), "y"), NA)
+})
+
+test_that("tip() requires a tag", {
+  expect_error(tip(NULL, "y"), "`tag` must not be empty")
+  expect_error(tip(list(), "y"), "`tag` must not be empty")
+  expect_error(tip(list(), "y"), NA)
+})
+
+test_that("click is only accepted by tip_icon() and tip_input()", {
+  expect_match(as.character(tip_icon("y", click = TRUE)), "onclick")
+  expect_match(as.character(tip_input(shiny::textInput("t", "T"), "y", click = TRUE)), "onclick")
+  expect_error(tip("x", "y", click = TRUE))
+})
+
+test_that("defaults can be set with global options", {
+  withr::with_options(
+    list(shinytip.position = "right", shinytip.width = "l",
+         shinytip.bg = "pink", shinytip.solid = TRUE, shinytip.click = TRUE),
+    {
+      html <- tip_tag("x", "y")
+      expect_match(html, 'data-balloon-pos="right"')
+      expect_match(html, 'data-balloon-length="large"')
+      expect_match(html, "--balloon-color: pink", fixed = TRUE)
+      expect_match(as.character(tip_icon("y")), "fa-solid")
+      expect_match(as.character(tip_icon("y")), "onclick")
+    }
+  )
 })

@@ -28,7 +28,8 @@ Suggests:
   shinycssloaders,
   shinydisconnect,
   shinyjs,
-  testthat (>= 3.0.0)
+  testthat (>= 3.0.0),
+  withr
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
