@@ -8,7 +8,9 @@ tip_theme(
   bg = getOption("shinytip.bg", "black"),
   fg = getOption("shinytip.fg", "white"),
   fontsize = getOption("shinytip.fontsize", "12px"),
+  radius = getOption("shinytip.radius", "2px"),
   animate = getOption("shinytip.animate", TRUE),
+  move = getOption("shinytip.move", "4px"),
   pointer = getOption("shinytip.pointer", TRUE)
 )
 }
@@ -17,9 +19,14 @@ tip_theme(
 
 \item{fg}{Colour ("foreground") of the tooltip text.}
 
-\item{fontsize}{The font size of the tooltip text.}
+\item{fontsize}{The font size of the tooltip text. A number is interpreted as pixels.}
+
+\item{radius}{The roundness of the tooltip's corners. A number is interpreted as pixels.}
 
 \item{animate}{If \code{TRUE}, animate the tooltip appearing and disappearing.}
+
+\item{move}{How far the tooltip slides while animating into view. A number is interpreted as
+pixels. Has no effect when \code{animate} is \code{FALSE}.}
 
 \item{pointer}{If \code{TRUE}, change the cursor when hovering over the tag.}
 }

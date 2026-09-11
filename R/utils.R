@@ -60,6 +60,11 @@ check_text <- function(x) {
   }
 }
 
+# A bare number in a theme is taken to mean pixels
+css_px <- function(x) {
+  if (is.numeric(x)) paste0(x, "px") else x
+}
+
 question_icon <- function(solid) {
   shiny::icon("question-circle", class = if (solid) "fa-solid")
 }

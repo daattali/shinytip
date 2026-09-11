@@ -8,8 +8,11 @@
 #' `options(shinytip.bg = "red", shinytip.fontsize = 24)`.
 #' @param bg Background colour of the tooltip.
 #' @param fg Colour ("foreground") of the tooltip text.
-#' @param fontsize The font size of the tooltip text.
+#' @param fontsize The font size of the tooltip text. A number is interpreted as pixels.
+#' @param radius The roundness of the tooltip's corners. A number is interpreted as pixels.
 #' @param animate If `TRUE`, animate the tooltip appearing and disappearing.
+#' @param move How far the tooltip slides while animating into view. A number is interpreted as
+#' pixels. Has no effect when `animate` is `FALSE`.
 #' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @return A `shinytip_theme` object, to be passed to the `theme` argument of [tip()],
 #' [tip_icon()], or [tip_input()].
@@ -35,10 +38,15 @@ tip_theme <- function(
     bg = getOption("shinytip.bg", "black"),
     fg = getOption("shinytip.fg", "white"),
     fontsize = getOption("shinytip.fontsize", "12px"),
+    radius = getOption("shinytip.radius", "2px"),
     animate = getOption("shinytip.animate", TRUE),
+    move = getOption("shinytip.move", "4px"),
     pointer = getOption("shinytip.pointer", TRUE)) {
   structure(
-    list(bg = bg, fg = fg, fontsize = fontsize, animate = animate, pointer = pointer),
+    list(
+      bg = bg, fg = fg, fontsize = fontsize, radius = radius,
+      animate = animate, move = move, pointer = pointer
+    ),
     class = "shinytip_theme"
   )
 }

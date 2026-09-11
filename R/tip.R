@@ -217,8 +217,10 @@ build_tip <- function(tag, content, content_disabled, position, width, theme,
   }
   bg <- theme$bg
   fg <- theme$fg
-  fontsize <- theme$fontsize
+  fontsize <- css_px(theme$fontsize)
+  radius <- css_px(theme$radius)
   animate <- theme$animate
+  move <- css_px(theme$move)
   pointer <- theme$pointer
 
   if (!position %in% names(shinytip_positions)) {
@@ -242,14 +244,12 @@ build_tip <- function(tag, content, content_disabled, position, width, theme,
   only_disabled <- is.null(content)
   label <- if (only_disabled) content_disabled else content
 
-  if (is.numeric(fontsize)) {
-    fontsize <- paste0(fontsize, "px")
-  }
-
   css <- paste0(
     "--balloon-color: ", bg, "; ",
     "--balloon-text-color: ", fg, "; ",
-    "--balloon-font-size: ", fontsize, ";",
+    "--balloon-font-size: ", fontsize, "; ",
+    "--balloon-border-radius: ", radius, "; ",
+    "--balloon-move: ", move, ";",
     if (!pointer) " cursor: inherit;"
   )
 

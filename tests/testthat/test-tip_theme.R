@@ -4,20 +4,25 @@ test_that("tip_theme() returns an object holding the package defaults", {
   expect_identical(theme$bg, "black")
   expect_identical(theme$fg, "white")
   expect_identical(theme$fontsize, "12px")
+  expect_identical(theme$radius, "2px")
   expect_true(theme$animate)
+  expect_identical(theme$move, "4px")
   expect_true(theme$pointer)
 })
 
 test_that("tip_theme() reads its defaults from global options", {
   withr::with_options(
     list(shinytip.bg = "pink", shinytip.fg = "navy", shinytip.fontsize = 20,
-         shinytip.animate = FALSE, shinytip.pointer = FALSE),
+         shinytip.radius = 6, shinytip.animate = FALSE, shinytip.move = 10,
+         shinytip.pointer = FALSE),
     {
       theme <- tip_theme()
       expect_identical(theme$bg, "pink")
       expect_identical(theme$fg, "navy")
       expect_identical(theme$fontsize, 20)
+      expect_identical(theme$radius, 6)
       expect_false(theme$animate)
+      expect_identical(theme$move, 10)
       expect_false(theme$pointer)
     }
   )

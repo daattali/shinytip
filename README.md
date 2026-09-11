@@ -140,7 +140,7 @@ The tooltip text can include emojis, and you can use `\n` to force a line break,
 | `tip()` | Add a tooltip to any Shiny tag, input, output, or plain text. |
 | `tip_icon()` | Create a question-mark icon that shows a tooltip. |
 | `tip_input()` | Add a question-mark icon with a tooltip to the end of an input's label. |
-| `tip_theme()` | Bundle a set of appearance options (colours, font size, animation, cursor) so that they can be defined once and reused. |
+| `tip_theme()` | Bundle a set of appearance options (colours, sizes, etc.) so that they can be defined once and reused. |
 
 [Check out the demo app](https://daattali.com/shiny/shinytip-demo/) to see all of these in action and to generate your own tooltips.
 
@@ -177,7 +177,7 @@ All three tooltip functions accept these parameters:
 
 <h2 id="themes">Tooltip theme</h2>
 
-Everything that affects how a tooltip looks lives in a `tip_theme()` object: `bg` (background colour), `fg` (text colour), `fontsize`, `animate` (whether the tooltip fades in and out), and `pointer` (whether the cursor changes on hover).
+Everything that affects how a tooltip looks lives in a `tip_theme()` object: `bg` (background colour), `fg` (text colour), `fontsize`, `radius` (how rounded the corners are), `animate` (whether the tooltip fades and slides in and out), `move` (how far it slides while animating), and `pointer` (whether the cursor changes on hover).
 
 Since it's a standalone object, you can define a theme once and use it in as many tooltips as you want:
 

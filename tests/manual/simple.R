@@ -33,10 +33,16 @@ ui <- fluidPage(fluidRow(
       theme = tip_theme(bg = "red", fg = "yellow")
     ),
     tip(
-     "don't animate, don't change cursor, size 20",
+     "don't animate, don't change cursor, size 20, rounded corners",
       sample_text,
       width = "fit",
-      theme = tip_theme(animate = FALSE, pointer = FALSE, fontsize = 20)
+      theme = tip_theme(animate = FALSE, pointer = FALSE, fontsize = 20, radius = 12)
+    ), br(),
+    tip(
+      "slides in from far away",
+      sample_text,
+      width = "fit",
+      theme = tip_theme(move = 40)
     ), br(),
     tip(
       "custom `style` on the tag (via ...), plus a theme on the tooltip",

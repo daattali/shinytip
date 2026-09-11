@@ -100,6 +100,13 @@ test_that("`theme` sets the tooltip appearance", {
                "--balloon-color: red", fixed = TRUE)
   expect_match(as.character(tip("x", "y", theme = tip_theme(fg = "pink", fontsize = 20))),
                "--balloon-text-color: pink; --balloon-font-size: 20px;", fixed = TRUE)
+  expect_match(as.character(tip("x", "y", theme = tip_theme(radius = "1em", move = "0.5rem"))),
+               "--balloon-border-radius: 1em; --balloon-move: 0.5rem;", fixed = TRUE)
+})
+
+test_that("`radius` and `move` fall back to the balloon.css defaults", {
+  expect_match(tip_tag("x", "y"), "--balloon-border-radius: 2px;", fixed = TRUE)
+  expect_match(tip_tag("x", "y"), "--balloon-move: 4px;", fixed = TRUE)
 })
 
 test_that("`theme` rejects anything that is not a tip_theme() object", {
@@ -157,11 +164,15 @@ test_that("pointer = FALSE leaves the cursor alone", {
   expect_false(grepl("cursor", tip_tag("x", "y")))
 })
 
-test_that("a numeric fontsize is treated as pixels", {
+test_that("a numeric length in a theme is treated as pixels", {
   expect_match(tip_tag("x", "y", theme = tip_theme(fontsize = 20)),
                "--balloon-font-size: 20px", fixed = TRUE)
   expect_match(tip_tag("x", "y", theme = tip_theme(fontsize = "2rem")),
                "--balloon-font-size: 2rem", fixed = TRUE)
+  expect_match(tip_tag("x", "y", theme = tip_theme(radius = 8)),
+               "--balloon-border-radius: 8px", fixed = TRUE)
+  expect_match(tip_tag("x", "y", theme = tip_theme(move = 12)),
+               "--balloon-move: 12px", fixed = TRUE)
 })
 
 test_that("elements that cannot have pseudo-elements are wrapped in a div", {

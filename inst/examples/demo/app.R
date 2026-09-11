@@ -77,6 +77,7 @@ ui <- fluidPage(
       colourpicker::colourInput("bg", "Background", "black"),
       colourpicker::colourInput("fg", "Text colour", "white"),
       numericInput("fontsize", "Text size", 16),
+      numericInput("radius", "Corner roundness", 2, min = 0),
     ),
     column(
       4,
@@ -84,9 +85,12 @@ ui <- fluidPage(
         textInput("content_disabled", "Disabled text", ""),
         "Shown only while the button is disabled"
       ),
-      checkboxInput("disabled", "Disable the button", FALSE),
-      br(),
-      checkboxInput("animate", "Allow animation", TRUE),
+      checkboxInput("disabled", "Disable the button", FALSE), br(),
+      shinytip::tip_input(
+        numericInput("move", "Animation distance", 4, min = 0),
+        "How far the tooltip slides while animating into view"
+      ),
+      checkboxInput("animate", "Allow animation", TRUE), br(),
       checkboxInput("pointer", "Change cursor on hover", TRUE)
     )
   ),
@@ -122,7 +126,9 @@ server <- function(input, output, session) {
       '    bg = "', input$bg, '",\n',
       '    fg = "', input$fg, '",\n',
       '    fontsize = ', input$fontsize, ',\n',
+      '    radius = ', input$radius, ',\n',
       '    animate = ', input$animate, ',\n',
+      '    move = ', input$move, ',\n',
       '    pointer = ', input$pointer, '\n',
       '  )\n',
       ')'
