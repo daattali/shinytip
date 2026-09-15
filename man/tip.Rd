@@ -11,6 +11,7 @@ tip(
   position = getOption("shinytip.position", "top"),
   width = getOption("shinytip.width", "line"),
   theme = tip_theme(),
+  wrap_tag = getOption("shinytip.wrap_tag", FALSE),
   ...
 )
 }
@@ -34,7 +35,13 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 \item{theme}{A \code{\link[=tip_theme]{tip_theme()}} object holding the tooltip's appearance (colours, font size,
 animation, cursor).}
 
-\item{...}{Additional attributes to pass to the tag.}
+\item{wrap_tag}{If \code{TRUE}, wrap \code{tag} in a \verb{<div>} and place the tooltip on that wrapper rather
+than on the tag itself. Use this when the tag cannot carry a tooltip of its own: a disabled input
+passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
+tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
+because the extra \verb{<div>} can affect the UI layout.}
+
+\item{...}{Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.}
 }
 \value{
 A Shiny tag that supports tooltips.
@@ -51,7 +58,8 @@ Only \code{tag}, \code{content}, and \code{content_disabled} cannot be set globa
 \details{
 Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome),
 the tag will get wrapped in a \verb{<div>}. When adding a tooltip to plain text, the text is wrapped
-in a \verb{<span>}. In all other cases, no additional HTML tags are created.
+in a \verb{<span>}. In all other cases, no additional HTML tags are created, unless you ask for one
+with \code{wrap_tag = TRUE}.
 }
 \section{Disabled inputs}{
 
@@ -70,11 +78,14 @@ Any inputs disabled with \code{shinyjs::disable()} are automatically detected.
 This means that you may need to adjust the position of the tooltip depending on where it appears
 on the page.
 \item The balloon project makes use of pseudo-elements, so if you're trying to
-add a tooltip to an element that already has pseudo-elements, it may not work.
+add a tooltip to an element that already has pseudo-elements, it may not work. Use
+\code{wrap_tag = TRUE} to place the tooltip on a wrapper element instead, which avoids the conflict.
 \item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 is not a supported interaction.
 \item If an element loses its opacity when disabled, then the tooltip will also lose its
 opacity when the element is disabled. This commonly affects tooltips on disabled \code{actionButton()}.
+Bootstrap 5 (used by \code{{bslib}}) also prevents disabled buttons from having tooltips on hover.
+Both these issues are fixed by \code{wrap_tag = TRUE}, which moves the tooltip onto a wrapper element.
 }
 }
 
@@ -89,7 +100,8 @@ if (interactive()) {
       tip(actionButton("btn", "hover me"), "Hello"),
       tip(
         actionButton("btn3", "can't touch this", disabled = TRUE),
-        content_disabled = "You do not have permission to do this"
+        content_disabled = "You do not have permission to do this",
+        wrap_tag = TRUE
       )
     ),
     server = function(input, output) {}

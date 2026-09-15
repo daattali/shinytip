@@ -10,7 +10,8 @@
 #'
 #' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome),
 #' the tag will get wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped
-#' in a `<span>`. In all other cases, no additional HTML tags are created.
+#' in a `<span>`. In all other cases, no additional HTML tags are created, unless you ask for one
+#' with `wrap_tag = TRUE`.
 #'
 #' @section Disabled inputs:
 #' Use `content_disabled` to give an input a tooltip that appears when it's disabled,
@@ -26,13 +27,16 @@
 #' on the page.
 #'
 #' - The balloon project makes use of pseudo-elements, so if you're trying to
-#' add a tooltip to an element that already has pseudo-elements, it may not work.
+#' add a tooltip to an element that already has pseudo-elements, it may not work. Use
+#' `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
 #'
 #' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
 #' is not a supported interaction.
 #'
 #' - If an element loses its opacity when disabled, then the tooltip will also lose its
 #' opacity when the element is disabled. This commonly affects tooltips on disabled `actionButton()`.
+#' Bootstrap 5 (used by `{bslib}`) also prevents disabled buttons from having tooltips on hover.
+#' Both these issues are fixed by `wrap_tag = TRUE`, which moves the tooltip onto a wrapper element.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
 #' Use `\n` to force a new line. Can be `NULL` if `content_disabled` is given, in which case
@@ -46,7 +50,12 @@
 #' `"l"` (large), `"xl"` (extra large).
 #' @param theme A [tip_theme()] object holding the tooltip's appearance (colours, font size,
 #' animation, cursor).
-#' @param ... Additional attributes to pass to the tag.
+#' @param wrap_tag If `TRUE`, wrap `tag` in a `<div>` and place the tooltip on that wrapper rather
+#' than on the tag itself. Use this when the tag cannot carry a tooltip of its own: a disabled input
+#' passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
+#' tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
+#' because the extra `<div>` can affect the UI layout.
+#' @param ... Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.
 #' @return A Shiny tag that supports tooltips.
 #' @seealso [tip_input()], [tip_icon()], [tip_theme()]
 #' @examples
@@ -60,7 +69,8 @@
 #'       tip(actionButton("btn", "hover me"), "Hello"),
 #'       tip(
 #'         actionButton("btn3", "can't touch this", disabled = TRUE),
-#'         content_disabled = "You do not have permission to do this"
+#'         content_disabled = "You do not have permission to do this",
+#'         wrap_tag = TRUE
 #'       )
 #'     ),
 #'     server = function(input, output) {}
@@ -75,10 +85,11 @@ tip <- function(
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
+    wrap_tag = getOption("shinytip.wrap_tag", FALSE),
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, click = FALSE, remote = FALSE, ...
+    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, remote = FALSE, ...
   )
 }
 
@@ -125,10 +136,14 @@ tip_icon <- function(
          "of its own. Use `tip_input()` to attach the icon to an input's label, or `tip()` to put the ",
          "tooltip on the input itself.", call. = FALSE)
   }
+  if ("wrap_tag" %in% names(list(...))) {
+    stop("tip_icon: `wrap_tag` is not supported because the tooltip is placed on an icon that ",
+         "shinytip creates, which never needs to be wrapped.", call. = FALSE)
+  }
 
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
-    position = position, width = width, theme = theme,
+    position = position, width = width, theme = theme, wrap_tag = FALSE,
     click = click, remote = FALSE, ...
   )
 }
@@ -179,10 +194,14 @@ tip_input <- function(
   if (is.null(classes) || !"shiny-input-container" %in% strsplit(classes, " ")[[1]]) {
     stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
   }
+  if ("wrap_tag" %in% names(list(...))) {
+    stop("tip_input: `wrap_tag` is not supported because the tooltip is placed on an icon in the ",
+         "input's label rather than on the input itself.", call. = FALSE)
+  }
 
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
-    position = position, width = width, theme = theme,
+    position = position, width = width, theme = theme, wrap_tag = FALSE,
     click = click, remote = !is.null(content_disabled), ...
   )
 
@@ -210,7 +229,7 @@ tip_input <- function(
 }
 
 ### The actual workhorse of building the tooltip
-build_tip <- function(tag, content, content_disabled, position, width, theme,
+build_tip <- function(tag, content, content_disabled, position, width, theme, wrap_tag,
                       click, remote, ...) {
   if (!inherits(theme, "shinytip_theme")) {
     stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
@@ -232,6 +251,10 @@ build_tip <- function(tag, content, content_disabled, position, width, theme,
     stop("tip: `width` must be one of: [", toString(names(shinytip_widths)), "]", call. = FALSE)
   }
   width <- shinytip_widths[[width]]
+
+  if (!is.logical(wrap_tag) || length(wrap_tag) != 1L || is.na(wrap_tag)) {
+    stop("tip: `wrap_tag` must be either `TRUE` or `FALSE`", call. = FALSE)
+  }
 
   if (is.null(content) && is.null(content_disabled)) {
     stop("tip: Must provide `content` or `content_disabled`", call. = FALSE)
@@ -258,9 +281,10 @@ build_tip <- function(tag, content, content_disabled, position, width, theme,
   }
 
   # balloon.css uses ::before/::after for tooltips, so some elements need to be
-  # wrapped in a div to allow pseudo-elements to work
+  # wrapped in a div to allow pseudo-elements to work. `wrap_tag` lets the user
+  # ask for the same treatment for any tag
   wrap_tags <- c("img", "input", "i", "select", "textarea")
-  wrapped <- inherits(tag, "shiny.tag.list") ||
+  wrapped <- wrap_tag || inherits(tag, "shiny.tag.list") ||
     (inherits(tag, "shiny.tag") && (tag$name %in% wrap_tags))
   if (wrapped) {
     tag <- shiny::div(tag)

@@ -175,6 +175,10 @@ All three tooltip functions accept these parameters:
 
 - **`solid`**: Use `solid = TRUE` to get a question-mark icon with a solid background.
 
+`tip()` accepts one more:
+
+- **`wrap_tag`**: Use `wrap_tag = TRUE` to wrap the element in a `<div>`. This is the fix for an element that can't carry a tooltip of its own, most often a disabled input (see [Limitations](#limitations)). It's opt-in because the extra `<div>` can affect the UI layout.
+
 <h2 id="themes">Tooltip theme</h2>
 
 Everything that affects how a tooltip looks lives in a `tip_theme()` object: `bg` (background colour), `fg` (text colour), `fontsize`, `radius` (how rounded the corners are), `animate` (whether the tooltip fades and slides in and out), `move` (how far it slides while animating), and `pointer` (whether the cursor changes on hover).
@@ -245,11 +249,11 @@ Tooltips have a habit of working nicely in a simple example and then breaking in
 
 - The tooltip text cannot contain HTML.
 
-- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results.
+- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. Use `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
 
 - On mobile and other touch devices, hovering isn't a supported interaction, so all tooltips are shown on click regardless of the `click` parameter. Dismissing a tooltip is done by tapping elsewhere rather than by tapping the element again.
 
-- If an element loses its opacity when it's disabled, then its tooltip will also lose its opacity. This most commonly affects tooltips on a disabled `actionButton()`.
+- If an element loses its opacity when it's disabled, then its tooltip will also lose its opacity. This most commonly affects tooltips on a disabled `actionButton()`. Bootstrap 5 (used by {bslib}) also prevents disabled buttons from having tooltips. Setting `wrap_tag = TRUE` solves both issues, by placing the tooltip on a wrapper element.
 
 <h2 id="similar">Similar packages</h2>
 

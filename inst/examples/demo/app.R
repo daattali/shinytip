@@ -120,6 +120,7 @@ server <- function(input, output, session) {
       '  actionButton("test", "Hover me!"', disabled, '),\n',
       content,
       content_disabled,
+      '  wrap_tag = TRUE,\n',
       '  position = "', input$position, '",\n',
       '  width = "', input$width, '",\n',
       '  theme = shinytip::tip_theme(\n',
@@ -136,7 +137,9 @@ server <- function(input, output, session) {
   })
 
   output$code <- renderText({
-    clean_code <- sub(", disabled = TRUE", "", code(), fixed = TRUE)
+    clean_code <- code()
+    clean_code <- sub(", disabled = TRUE", "", clean_code, fixed = TRUE)
+    clean_code <- sub("[[:space:]]+wrap_tag = TRUE,\n", "", clean_code)
     clean_code
   })
 

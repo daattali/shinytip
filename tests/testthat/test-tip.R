@@ -231,3 +231,41 @@ test_that("defaults can be set with global options", {
     }
   )
 })
+
+test_that("wrap_tag = TRUE wraps the tag and moves the tooltip onto the wrapper", {
+  html <- tip_tag(shiny::actionButton("b", "go"), "y", wrap_tag = TRUE)
+  expect_match(html, "^<div")
+  expect_match(html, "shinytip-inline")
+  outer <- substr(html, 1, regexpr(">", html, fixed = TRUE))
+  expect_match(outer, "data-balloon-pos", fixed = TRUE)
+  expect_match(outer, "shinytip-inline", fixed = TRUE)
+  button <- substring(html, regexpr("<button", html, fixed = TRUE))
+  expect_false(grepl("data-balloon-pos", button, fixed = TRUE))
+  expect_false(grepl("shinytip", button, fixed = TRUE))
+})
+
+test_that("`...` lands on the wrapper when wrap_tag = TRUE", {
+  html <- tip_tag(shiny::actionButton("b", "go"), "y", wrap_tag = TRUE, style = "margin: 5px")
+  expect_match(html, "^<div")
+  outer <- substr(html, 1, regexpr(">", html, fixed = TRUE))
+  expect_match(outer, "margin: 5px", fixed = TRUE)
+})
+
+test_that("wrap_tag must be a single TRUE or FALSE", {
+  expect_error(tip("x", "y", wrap_tag = "yes"), "`wrap_tag` must be either")
+  expect_error(tip("x", "y", wrap_tag = NA), "`wrap_tag` must be either")
+  expect_error(tip("x", "y", wrap_tag = c(TRUE, FALSE)), "`wrap_tag` must be either")
+})
+
+test_that("wrap_tag can be set with a global option", {
+  withr::with_options(list(shinytip.wrap_tag = TRUE), {
+    expect_match(tip_tag(shiny::actionButton("b", "go"), "y"), "shinytip-inline")
+  })
+  expect_no_match(tip_tag(shiny::actionButton("b", "go"), "y"), "shinytip-inline")
+})
+
+test_that("wrap_tag is rejected by tip_icon() and tip_input()", {
+  expect_error(tip_icon("y", wrap_tag = TRUE), "`wrap_tag` is not supported")
+  expect_error(tip_input(shiny::textInput("t", "T"), "y", wrap_tag = TRUE),
+               "`wrap_tag` is not supported")
+})
