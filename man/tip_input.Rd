@@ -13,6 +13,7 @@ tip_input(
   theme = tip_theme(),
   click = getOption("shinytip.click", FALSE),
   solid = getOption("shinytip.solid", FALSE),
+  id = NULL,
   ...
 )
 }
@@ -42,6 +43,10 @@ On mobile/touch devices that do not support hover, tooltips are always shown on 
 regardless of this parameter.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
+
+\item{id}{An optional name for the tooltip, so that it can be modified from the server with
+\code{\link[=tip_update]{tip_update()}}. This is the tooltip's own name and is unrelated to the \code{inputId} of any input
+it is attached to, so the two may safely be the same. In a Shiny module, wrap it in \code{ns()}.}
 
 \item{...}{Additional attributes to pass to the question-mark icon added to the label.}
 }
@@ -80,5 +85,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}, \code{\link[=tip_update]{tip_update()}}
 }

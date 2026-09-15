@@ -16,7 +16,7 @@
 #' @param pointer If `TRUE`, change the cursor when hovering over the tag.
 #' @return A `shinytip_theme` object, to be passed to the `theme` argument of [tip()],
 #' [tip_icon()], or [tip_input()].
-#' @seealso [tip()], [tip_icon()], [tip_input()]
+#' @seealso [tip()], [tip_icon()], [tip_input()], [tip_update()]
 #' @examples
 #' warning_theme <- tip_theme(bg = "#B00020", fg = "white", fontsize = 14)
 #'

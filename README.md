@@ -64,6 +64,7 @@ See the [demo Shiny app](https://daattali.com/shiny/shinytip-demo/) online to pl
 - [Tooltip theme](#themes)
 - [Setting defaults for all tooltips](#defaults)
 - [Tooltips on disabled inputs](#disabled)
+- [Updating a tooltip](#update)
 - [Where {shinytip} works](#where)
 - [Limitations](#limitations)
 - [Similar packages](#similar)
@@ -141,6 +142,7 @@ The tooltip text can include emojis, and you can use `\n` to force a line break,
 | `tip_icon()` | Create a question-mark icon that shows a tooltip. |
 | `tip_input()` | Add a question-mark icon with a tooltip to the end of an input's label. |
 | `tip_theme()` | Bundle a set of appearance options (colours, sizes, etc.) so that they can be defined once and reused. |
+| `tip_update()` | Change a tooltip's text or appearance. |
 
 [Check out the demo app](https://daattali.com/shiny/shinytip-demo/) to see all of these in action and to generate your own tooltips.
 
@@ -230,6 +232,31 @@ shinyApp(ui, server)
 ```
 
 If you only provide `content_disabled`, the tooltip is shown *only* while the input is disabled. If you provide both `content` and `content_disabled`, the tooltip swaps its text depending on the input's state. Inputs that are disabled with `shinyjs::disable()` are detected automatically.
+
+<h2 id="update">Updating a tooltip</h2>
+
+To change a tooltip, it must be given an `id` when created, and use `tip_update()` in the server.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("btn", "Click me") |>
+    tip("You haven't clicked yet", id = "btn_tip", position = "right")
+)
+
+server <- function(input, output, session) {
+  # observeEvent(input$btn, {
+  #   tip_update("btn_tip", content = paste("You clicked", input$btn, "times"))
+  # })
+}
+
+shinyApp(ui, server)
+```
+
+The `id` belongs to the *tooltip*, not to the tag it's attached to, so it can safely be the same as the `inputId` of the input it's sitting on. This also means you don't have to think about where the tooltip actually ended up: whether it's on an input, on a `<span>` around some text, or on a question-mark icon inside a label, `tip_update()` finds it the same way.
+
+Along with the text, you can update `position`, `width`, and the `theme`. Anything you don't pass is left alone, and the change takes effect immediately, even if the tooltip happens to be open at that moment.
 
 <h2 id="where">Where {shinytip} works</h2>
 

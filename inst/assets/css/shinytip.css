@@ -14,19 +14,29 @@
   content: attr(data-shinytip-label);
 }
 
-/* Support tooltips on disabled state */
-.shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
-.shinytip-disabled-only:not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {
+/* Support tooltips on disabled state.
+   How a tooltip behaves follows from which of the two texts it has, rather than from a
+   class, so that creating a tooltip and updating one from the server (`tip_update()`)
+   only ever need to set the same two attributes:
+     - `data-shinytip-label` alone: an ordinary tooltip
+     - `data-shinytip-content-disabled` alone: shown only while the input is disabled
+     - both: the text swaps depending on the input's state */
+
+/* A tooltip with no regular text stays hidden while the input is enabled */
+.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
+.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {
   display: none;
 }
-.shiny-input-container:not(.shinytip-disabled):not(:has(:disabled, .shinytip-disabled)) .shinytip-remote.shinytip-disabled-only {
+.shiny-input-container:not(.shinytip-disabled):not(:has(:disabled, .shinytip-disabled)) .shinytip-remote:not([data-shinytip-label]) {
   display: none;
 }
-.shinytip-disabled-swap:not(.shinytip-remote):is(:disabled, .shinytip-disabled):after,
-.shinytip-disabled-swap:not(.shinytip-remote):has(:disabled, .shinytip-disabled):after {
+
+/* While the input is disabled, the disabled text takes over */
+.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):is(:disabled, .shinytip-disabled):after,
+.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):has(:disabled, .shinytip-disabled):after {
   content: attr(data-shinytip-content-disabled);
 }
-.shiny-input-container.shinytip-disabled .shinytip-remote.shinytip-disabled-swap:after,
-.shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote.shinytip-disabled-swap:after {
+.shiny-input-container.shinytip-disabled .shinytip-remote[data-shinytip-content-disabled]:after,
+.shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote[data-shinytip-content-disabled]:after {
   content: attr(data-shinytip-content-disabled);
 }

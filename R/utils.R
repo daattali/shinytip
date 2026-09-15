@@ -53,11 +53,39 @@ is_checkbox <- function(tag) {
   is_checkbox
 }
 
-check_text <- function(x) {
+is_string <- function(x) {
+  is.character(x) && length(x) == 1L && !is.na(x)
+}
+
+# `NA` is how a caller asks for a tooltip option to be dropped rather than changed
+is_removal <- function(x) {
+  length(x) == 1L && is.na(x)
+}
+
+check_text <- function(x, allow_removal = FALSE) {
   if (is.null(x)) return()
-  if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(trimws(x))) {
+  if (allow_removal && is_removal(x)) return()
+  if (!is_string(x) || !nzchar(trimws(x))) {
     stop("tip: `content` and `content_disabled` must be single non-empty strings", call. = FALSE)
   }
+}
+
+check_id <- function(id) {
+  if (is.null(id)) return()
+  if (!is_string(id) || !nzchar(trimws(id))) {
+    stop("tip: `id` must be a single non-empty string", call. = FALSE)
+  }
+}
+
+# Tooltip text keeps its line breaks only when balloon.css is told to expect them
+has_newline <- function(...) {
+  texts <- Filter(is_string, list(...))
+  any(vapply(texts, grepl, logical(1), pattern = "\n", fixed = TRUE))
+}
+
+# Drop the entries that stand for "this attribute/property should not be present"
+drop_removals <- function(x) {
+  x[!vapply(x, is_removal, logical(1))]
 }
 
 # A bare number in a theme is taken to mean pixels
@@ -83,8 +111,9 @@ shinytip_dependencies <- function() {
         name = "shinytip",
         version = as.character(utils::packageVersion("shinytip")),
         package = "shinytip",
-        src = "assets/css",
-        stylesheet = "shinytip.css"
+        src = "assets",
+        stylesheet = "css/shinytip.css",
+        script = "js/shinytip.js"
       )
     )
   }

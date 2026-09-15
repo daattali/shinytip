@@ -12,6 +12,7 @@ tip(
   width = getOption("shinytip.width", "line"),
   theme = tip_theme(),
   wrap_tag = getOption("shinytip.wrap_tag", FALSE),
+  id = NULL,
   ...
 )
 }
@@ -40,6 +41,10 @@ than on the tag itself. Use this when the tag cannot carry a tooltip of its own:
 passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
 tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
 because the extra \verb{<div>} can affect the UI layout.}
+
+\item{id}{An optional name for the tooltip, so that it can be modified from the server with
+\code{\link[=tip_update]{tip_update()}}. This is the tooltip's own name and is unrelated to the \code{inputId} of any input
+it is attached to, so the two may safely be the same. In a Shiny module, wrap it in \code{ns()}.}
 
 \item{...}{Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.}
 }
@@ -110,5 +115,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}
+\code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}, \code{\link[=tip_update]{tip_update()}}
 }
