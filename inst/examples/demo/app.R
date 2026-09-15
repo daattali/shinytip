@@ -139,7 +139,7 @@ server <- function(input, output, session) {
   output$code <- renderText({
     clean_code <- code()
     clean_code <- sub(", disabled = TRUE", "", clean_code, fixed = TRUE)
-    clean_code <- sub("[[:space:]]+wrap_tag = TRUE,\n", "", clean_code)
+    clean_code <- sub("[[:space:]]+wrap_tag = TRUE,", "", clean_code)
     clean_code
   })
 
