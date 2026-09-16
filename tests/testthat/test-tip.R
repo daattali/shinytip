@@ -291,6 +291,19 @@ test_that("`id` lands on whichever element carries the tooltip", {
   }
 })
 
+test_that("JavaScript is only attached to tooltips that can be updated", {
+  dep_names <- function(tag) {
+    vapply(htmltools::renderTags(tag)$dependencies, `[[`, character(1), "name")
+  }
+  expect_false("shinytip-update" %in% dep_names(tip("x", "y")))
+  expect_false("shinytip-update" %in% dep_names(tip_icon("y")))
+  expect_false("shinytip-update" %in% dep_names(tip_input(shiny::textInput("i", "I"), "y")))
+
+  expect_true("shinytip-update" %in% dep_names(tip("x", "y", id = "t")))
+  expect_true("shinytip-update" %in% dep_names(tip_icon("y", id = "t")))
+  expect_true("shinytip-update" %in% dep_names(tip_input(shiny::textInput("i", "I"), "y", id = "t")))
+})
+
 test_that("`id` must be a single non-empty string", {
   for (bad in list("", "  ", NA, c("a", "b"), 42, list("a"))) {
     expect_error(tip("x", "y", id = bad), "`id` must be a single non-empty string")

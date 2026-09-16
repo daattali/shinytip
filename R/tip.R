@@ -356,7 +356,9 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     )
   }
 
-  htmltools::attachDependencies(tag, shinytip_dependencies(), append = TRUE)
+  htmltools::attachDependencies(
+    tag, shinytip_dependencies(updatable = !is.null(id)), append = TRUE
+  )
 }
 
 # Turn a named list of CSS properties into a `style` attribute

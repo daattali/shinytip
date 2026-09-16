@@ -97,8 +97,11 @@ question_icon <- function(solid) {
   shiny::icon("question-circle", class = if (solid) "fa-solid")
 }
 
-shinytip_dependencies <- function() {
+# The CSS is all a tooltip needs. The JavaScript is only attached to tooltips that were given
+# an `id`, so that apps that never call `tip_update()` stay free of JavaScript.
+shinytip_dependencies <- function(updatable) {
   if (is.null(.shinytipglobals$deps)) {
+    version <- as.character(utils::packageVersion("shinytip"))
     .shinytipglobals$deps <- list(
       htmltools::htmlDependency(
         name = "balloon-css",
@@ -109,13 +112,19 @@ shinytip_dependencies <- function() {
       ),
       htmltools::htmlDependency(
         name = "shinytip",
-        version = as.character(utils::packageVersion("shinytip")),
+        version = version,
         package = "shinytip",
-        src = "assets",
-        stylesheet = "css/shinytip.css",
-        script = "js/shinytip.js"
+        src = "assets/css",
+        stylesheet = "shinytip.css"
       )
     )
+    .shinytipglobals$update_dep <- htmltools::htmlDependency(
+      name = "shinytip-update",
+      version = version,
+      package = "shinytip",
+      src = "assets/js",
+      script = "shinytip.js"
+    )
   }
-  .shinytipglobals$deps
+  c(.shinytipglobals$deps, if (updatable) list(.shinytipglobals$update_dep))
 }
