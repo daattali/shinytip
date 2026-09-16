@@ -300,6 +300,7 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     tag,
     class = "shinytip",
     `aria-label` = "",
+    `data-balloon-nofocus` = NA,   # don't show after clicking, re-enable for keyboard focus using css
     `data-shinytip-label` = label,
     `data-balloon-pos` = position,
     `data-balloon-break` = if (newlines) NA,

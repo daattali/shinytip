@@ -30,3 +30,9 @@
 .shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote.shinytip-disabled-swap:after {
   content: attr(data-shinytip-content-disabled);
 }
+
+/* Show tooltip on keyboard focus */
+.shinytip:focus-visible:before,
+.shinytip:focus-visible:after {
+  opacity: 1;
+}
