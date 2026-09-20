@@ -11,7 +11,7 @@ tip_icon(
   theme = tip_theme(),
   click = getOption("shinytip.click", FALSE),
   solid = getOption("shinytip.solid", FALSE),
-  id = NULL,
+  tip_id = NULL,
   ...
 )
 }
@@ -35,9 +35,9 @@ regardless of this parameter.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 
-\item{id}{An optional name for the tooltip, so that it can be modified from the server with
-\code{\link[=tip_update]{tip_update()}}. This is the tooltip's own name and is unrelated to the \code{inputId} of any input
-it is attached to, so the two may safely be the same. In a Shiny module, wrap it in \code{ns()}.}
+\item{tip_id}{An optional name for the tooltip, which lets you change its text from the server
+with \code{\link[=tip_update]{tip_update()}}. This is separate from the \code{id} attribute of the tag, which can still be set
+through \code{...}. In a Shiny module, wrap it in \code{ns()}.}
 
 \item{...}{Additional attributes to pass to the question-mark icon.}
 }
@@ -62,5 +62,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_theme]{tip_theme()}}, \code{\link[=tip_update]{tip_update()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_theme]{tip_theme()}}
 }

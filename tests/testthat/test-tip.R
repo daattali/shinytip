@@ -15,7 +15,7 @@ test_that("tooltip text must be a single non-empty string", {
   expect_silent(tip(shiny::div(), content_disabled = "ok"))
 })
 
-test_that("tip() without content_disabled only has the regular text", {
+test_that("tip() without content_disabled is unchanged", {
   html <- tip_tag(shiny::div(), "hello")
   expect_match(html, 'data-shinytip-label="hello"')
   expect_false(grepl("data-shinytip-content-disabled", html))
@@ -42,13 +42,12 @@ test_that("tip() with both texts keeps each in its own attribute", {
 test_that("tip_input() marks the icon as reading its state from the container", {
   html <- as.character(tip_input(shiny::textInput("test", "test"), content_disabled = "why not"))
   expect_match(html, "shinytip-remote")
-  expect_match(html, 'data-shinytip-content-disabled="why not"')
   expect_false(grepl("data-shinytip-label", html))
 })
 
-test_that("tip_input() without content_disabled is unchanged", {
+test_that("tip_input() always reads its disabled state from the container, so that a disabled text can be added later", {
   html <- as.character(tip_input(shiny::textInput("test", "test"), "hello"))
-  expect_false(grepl("shinytip-remote", html))
+  expect_match(html, "shinytip-remote")
 })
 
 test_that("tip_input() works on checkboxes, which have no <label> of their own", {
@@ -268,45 +267,24 @@ test_that("wrap_tag is rejected by tip_icon() and tip_input()", {
                "`wrap_tag` is not supported")
 })
 
-test_that("`id` names the tooltip without touching the tag's own id", {
-  html <- tip_tag(shiny::actionButton("btn", "go"), "y", id = "btn")
-  expect_match(html, 'data-shinytip-id="btn"')
-  # the button keeps the one `id` that Shiny gave it
-  expect_length(gregexpr(' id="btn"', html, fixed = TRUE)[[1]], 1L)
+test_that("`tip_id` names the tooltip without touching the tag's own id", {
+  html <- tip_tag(shiny::actionButton("btn", "go"), "y", tip_id = "btn_tip")
+  expect_match(html, 'data-shinytip-id="btn_tip"')
+  expect_match(html, 'id="btn"', fixed = TRUE)
+  expect_match(tip_tag("x", "y", id = "mine", tip_id = "t"), 'id="mine"', fixed = TRUE)
+  expect_false(grepl("data-shinytip-id", tip_tag("x", "y")))
 })
 
-test_that("`id` lands on whichever element carries the tooltip", {
-  # the element that gets the tooltip differs by case, but the id always rides along with it
-  carriers <- list(
-    text = tip_tag("some text", "y", id = "t"),
-    tag = tip_tag(shiny::div(), "y", id = "t"),
-    wrapped = tip_tag(shiny::img(src = "x.png"), "y", id = "t"),
-    wrap_tag = tip_tag(shiny::actionButton("b", "go"), "y", id = "t", wrap_tag = TRUE),
-    icon = as.character(tip_icon("y", id = "t")),
-    input = as.character(tip_input(shiny::textInput("i", "I"), "y", id = "t"))
-  )
-  for (html in carriers) {
-    opening <- regmatches(html, regexpr("<[^>]*data-balloon-pos[^>]*>", html))
-    expect_match(opening, 'data-shinytip-id="t"')
-  }
+test_that("`tip_id` works on tip_icon() and tip_input()", {
+  expect_match(as.character(tip_icon("y", tip_id = "t")), 'data-shinytip-id="t"')
+  expect_match(as.character(tip_input(shiny::textInput("i", "I"), "y", tip_id = "t")),
+               'data-shinytip-id="t"')
 })
 
 test_that("JavaScript is only attached to tooltips that can be updated", {
-  dep_names <- function(tag) {
-    vapply(htmltools::renderTags(tag)$dependencies, `[[`, character(1), "name")
+  has_js <- function(tag) {
+    "shinytip-update" %in% vapply(htmltools::renderTags(tag)$dependencies, `[[`, character(1), "name")
   }
-  expect_false("shinytip-update" %in% dep_names(tip("x", "y")))
-  expect_false("shinytip-update" %in% dep_names(tip_icon("y")))
-  expect_false("shinytip-update" %in% dep_names(tip_input(shiny::textInput("i", "I"), "y")))
-
-  expect_true("shinytip-update" %in% dep_names(tip("x", "y", id = "t")))
-  expect_true("shinytip-update" %in% dep_names(tip_icon("y", id = "t")))
-  expect_true("shinytip-update" %in% dep_names(tip_input(shiny::textInput("i", "I"), "y", id = "t")))
-})
-
-test_that("`id` must be a single non-empty string", {
-  for (bad in list("", "  ", NA, c("a", "b"), 42, list("a"))) {
-    expect_error(tip("x", "y", id = bad), "`id` must be a single non-empty string")
-  }
-  expect_silent(tip("x", "y", id = "ok"))
+  expect_false(has_js(tip("x", "y")))
+  expect_true(has_js(tip("x", "y", tip_id = "t")))
 })

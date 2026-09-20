@@ -2,36 +2,23 @@
 % Please edit documentation in R/tip_update.R
 \name{tip_update}
 \alias{tip_update}
-\title{Update a tooltip from the server}
+\title{Update the text of a tooltip from the server}
 \usage{
 tip_update(
-  id,
+  tip_id,
   content = NULL,
   content_disabled = NULL,
-  position = NULL,
-  width = NULL,
-  theme = NULL,
   session = shiny::getDefaultReactiveDomain()
 )
 }
 \arguments{
-\item{id}{The \code{id} that was given to the tooltip when it was created.}
+\item{tip_id}{The \code{tip_id} that was given to the tooltip when it was created.}
 
-\item{content}{The new text in the tooltip, or \code{NA} to remove it. See the \emph{Removing text}
-section.}
+\item{content}{The new text of the tooltip. Leave it out to keep the current text, or use \code{NA}
+to remove it.}
 
-\item{content_disabled}{The new text to show while the input is disabled, or \code{NA} to remove it.
-See the \emph{Removing text} section.}
-
-\item{position}{The position of the tooltip in relation to the tag. One of: \code{"top"}, \code{"bottom"},
-\code{"left"}, \code{"right"}, \code{"top-left"}, \code{"top-right"}, \code{"bottom-left"}, \code{"bottom-right"}.}
-
-\item{width}{How wide should the tooltip be? One of: \code{"line"} (place the entire tooltip in one
-line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"s"} (small), \code{"m"} (medium),
-\code{"l"} (large), \code{"xl"} (extra large).}
-
-\item{theme}{A \code{\link[=tip_theme]{tip_theme()}} object holding the tooltip's appearance (colours, font size,
-animation, cursor).}
+\item{content_disabled}{The new text to show while the input is disabled. Leave it out to keep
+the current text, or use \code{NA} to remove it.}
 
 \item{session}{The Shiny session object. You should not need to provide this.}
 }
@@ -39,29 +26,14 @@ animation, cursor).}
 Nothing. Called for the side effect of updating a tooltip in the browser.
 }
 \description{
-Change the text or the appearance of an existing tooltip. The tooltip must have been given an
-\code{id} when it was created with \code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, or \code{\link[=tip_input]{tip_input()}}.\cr\cr
-Only the parameters you provide are changed; everything else about the tooltip is left as
-it is. The change is applied immediately, even while the tooltip is being shown.
+Change the text of a tooltip that was given a \code{tip_id} when it was created with \code{\link[=tip]{tip()}},
+\code{\link[=tip_icon]{tip_icon()}}, or \code{\link[=tip_input]{tip_input()}}. The change is applied immediately, even while the tooltip is
+being shown. If several tooltips share the same \code{tip_id}, they are all updated.\cr\cr
+Each of the two texts can be changed, added, or removed, which means a tooltip can also change
+how it behaves: for example, adding \code{content_disabled} to a tooltip that only has \code{content} makes
+it show a different text while the input is disabled. See the \emph{Disabled inputs} section of
+\code{\link[=tip]{tip()}} for what each combination of the two texts means.
 }
-\section{Removing text}{
-
-Passing \code{NA} (rather than a string) to \code{content} or \code{content_disabled} removes that text from
-the tooltip. A tooltip must keep at least one of the two, so they cannot both be removed.
-See the \emph{Disabled inputs} section of \code{\link[=tip]{tip()}} for what each combination means.
-}
-
-\section{Notes}{
-
-\itemize{
-\item If several tooltips share the same \code{id}, they are all updated. This makes it easy to update
-a group of tooltips at once, but it also means ids should be unique when that isn't wanted.
-\item Updating a tooltip that isn't on the page does nothing (a message is written to the browser's
-console). A tooltip that is re-rendered, for example by \code{renderUI()}, goes back to the text it
-was created with.
-}
-}
-
 \examples{
 if (interactive()) {
   library(shiny)
@@ -69,7 +41,7 @@ if (interactive()) {
 
   shinyApp(
     ui = fluidPage(br(),
-      tip(actionButton("btn", "hover me"), "Click to count", id = "btn_tip")
+      tip(actionButton("btn", "hover me"), "Not clicked yet", tip_id = "btn_tip")
     ),
     server = function(input, output, session) {
       observeEvent(input$btn, {
@@ -81,5 +53,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_theme]{tip_theme()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_input]{tip_input()}}
 }

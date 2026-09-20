@@ -1,65 +1,31 @@
-// Apply the tooltip changes sent from the server by `tip_update()`.
-//
-// Every tooltip option lives as an attribute or CSS property on the element that carries
-// the tooltip, and the CSS reads the tooltip text straight out of those attributes. An
-// update is therefore nothing more than setting a few attributes: no re-render, no Shiny
-// binding, and no need to know whether the tooltip sits on an input, a wrapper we created,
-// an icon inside a label, or a plain piece of text.
-(function() {
-  "use strict";
+// Changes the text of a tooltip. Sent by `tip_update()`.
+// A tooltip's mode follows from which of the two text attributes exist (see shinytip.css), so
+// adding or removing a text is just setting or removing its attribute. A text that is missing
+// from the message is left as it is, and one that is `null` is removed.
+Shiny.addCustomMessageHandler("shinytip-update", function(msg) {
+  var texts = { content: "data-shinytip-label", content_disabled: "data-shinytip-content-disabled" };
 
-  if (typeof Shiny === "undefined") {
-    return;
-  }
+  document.querySelectorAll("[data-shinytip-id]").forEach(function(el) {
+    if (el.getAttribute("data-shinytip-id") !== msg.id) return;
 
-  // Tooltips keep their line breaks only when `data-balloon-break` is present. R derives
-  // that attribute when building a tooltip, but after a partial update only the browser
-  // knows both of the tooltip's texts.
-  function syncNewlines(el) {
-    var multiline = ["data-shinytip-label", "data-shinytip-content-disabled"].some(
-      function(name) {
-        var text = el.getAttribute(name);
-        return text !== null && text.indexOf("\n") !== -1;
-      }
-    );
-    if (multiline) {
+    var next = {};
+    Object.keys(texts).forEach(function(key) {
+      next[texts[key]] = key in msg ? msg[key] : el.getAttribute(texts[key]);
+    });
+    var attrs = Object.keys(next);
+    if (attrs.every(function(attr) { return next[attr] === null; })) {
+      console.warn("shinytip: a tooltip needs at least one text, so '" + msg.id + "' was not updated");
+      return;
+    }
+
+    attrs.forEach(function(attr) {
+      if (next[attr] === null) el.removeAttribute(attr); else el.setAttribute(attr, next[attr]);
+    });
+    // A tooltip only keeps its line breaks when balloon.css is told to expect them
+    if (attrs.some(function(attr) { return /\n/.test(next[attr] || ""); })) {
       el.setAttribute("data-balloon-break", "");
     } else {
       el.removeAttribute("data-balloon-break");
     }
-  }
-
-  function update(el, msg) {
-    Object.keys(msg.attrs || {}).forEach(function(name) {
-      if (msg.attrs[name] === null) {
-        el.removeAttribute(name);
-      } else {
-        el.setAttribute(name, msg.attrs[name]);
-      }
-    });
-    // Set the properties one at a time instead of replacing `style` wholesale, so that any
-    // styles given when the tooltip was created are left alone
-    Object.keys(msg.style || {}).forEach(function(name) {
-      if (msg.style[name] === null) {
-        el.style.removeProperty(name);
-      } else {
-        el.style.setProperty(name, msg.style[name]);
-      }
-    });
-    syncNewlines(el);
-  }
-
-  Shiny.addCustomMessageHandler("shinytip-update", function(msg) {
-    // Matching on the attribute value rather than with an attribute selector, so that an
-    // id containing CSS-significant characters needs no escaping
-    var tips = Array.prototype.filter.call(
-      document.querySelectorAll("[data-shinytip-id]"),
-      function(el) { return el.getAttribute("data-shinytip-id") === msg.id; }
-    );
-    if (tips.length === 0) {
-      console.warn("shinytip: no tooltip with id '" + msg.id + "' was found on the page");
-      return;
-    }
-    tips.forEach(function(el) { update(el, msg); });
   });
-})();
+});

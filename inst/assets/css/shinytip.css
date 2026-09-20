@@ -14,15 +14,9 @@
   content: attr(data-shinytip-label);
 }
 
-/* Support tooltips on disabled state.
-   How a tooltip behaves follows from which of the two texts it has, rather than from a
-   class, so that creating a tooltip and updating one from the server (`tip_update()`)
-   only ever need to set the same two attributes:
-     - `data-shinytip-label` alone: an ordinary tooltip
-     - `data-shinytip-content-disabled` alone: shown only while the input is disabled
-     - both: the text swaps depending on the input's state */
-
-/* A tooltip with no regular text stays hidden while the input is enabled */
+/* Support tooltips on disabled state. Which text a tooltip has decides how it behaves: only
+   `data-shinytip-label` is an ordinary tooltip, only `data-shinytip-content-disabled` is shown
+   only while disabled, and both swap depending on the state */
 .shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
 .shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {
   display: none;
@@ -30,8 +24,6 @@
 .shiny-input-container:not(.shinytip-disabled):not(:has(:disabled, .shinytip-disabled)) .shinytip-remote:not([data-shinytip-label]) {
   display: none;
 }
-
-/* While the input is disabled, the disabled text takes over */
 .shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):is(:disabled, .shinytip-disabled):after,
 .shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):has(:disabled, .shinytip-disabled):after {
   content: attr(data-shinytip-content-disabled);
@@ -39,4 +31,10 @@
 .shiny-input-container.shinytip-disabled .shinytip-remote[data-shinytip-content-disabled]:after,
 .shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote[data-shinytip-content-disabled]:after {
   content: attr(data-shinytip-content-disabled);
+}
+
+/* Show tooltip on keyboard focus */
+.shinytip:focus-visible:before,
+.shinytip:focus-visible:after {
+  opacity: 1;
 }

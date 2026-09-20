@@ -1,32 +1,20 @@
-#' Update a tooltip from the server
+#' Update the text of a tooltip from the server
 #'
-#' Change the text or the appearance of an existing tooltip. The tooltip must have been given an
-#' `id` when it was created with [tip()], [tip_icon()], or [tip_input()].\cr\cr
-#' Only the parameters you provide are changed; everything else about the tooltip is left as
-#' it is. The change is applied immediately, even while the tooltip is being shown.
-#'
-#' @section Removing text:
-#' Passing `NA` (rather than a string) to `content` or `content_disabled` removes that text from
-#' the tooltip. A tooltip must keep at least one of the two, so they cannot both be removed.
-#' See the *Disabled inputs* section of [tip()] for what each combination means.
-#'
-#' @section Notes:
-#' - If several tooltips share the same `id`, they are all updated. This makes it easy to update
-#' a group of tooltips at once, but it also means ids should be unique when that isn't wanted.
-#'
-#' - Updating a tooltip that isn't on the page does nothing (a message is written to the browser's
-#' console). A tooltip that is re-rendered, for example by `renderUI()`, goes back to the text it
-#' was created with.
-#'
-#' @param id The `id` that was given to the tooltip when it was created.
-#' @param content The new text in the tooltip, or `NA` to remove it. See the *Removing text*
-#' section.
-#' @param content_disabled The new text to show while the input is disabled, or `NA` to remove it.
-#' See the *Removing text* section.
-#' @inheritParams tip
+#' Change the text of a tooltip that was given a `tip_id` when it was created with [tip()],
+#' [tip_icon()], or [tip_input()]. The change is applied immediately, even while the tooltip is
+#' being shown. If several tooltips share the same `tip_id`, they are all updated.\cr\cr
+#' Each of the two texts can be changed, added, or removed, which means a tooltip can also change
+#' how it behaves: for example, adding `content_disabled` to a tooltip that only has `content` makes
+#' it show a different text while the input is disabled. See the *Disabled inputs* section of
+#' [tip()] for what each combination of the two texts means.
+#' @param tip_id The `tip_id` that was given to the tooltip when it was created.
+#' @param content The new text of the tooltip. Leave it out to keep the current text, or use `NA`
+#' to remove it.
+#' @param content_disabled The new text to show while the input is disabled. Leave it out to keep
+#' the current text, or use `NA` to remove it.
 #' @param session The Shiny session object. You should not need to provide this.
 #' @return Nothing. Called for the side effect of updating a tooltip in the browser.
-#' @seealso [tip()], [tip_icon()], [tip_input()], [tip_theme()]
+#' @seealso [tip()], [tip_icon()], [tip_input()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -34,7 +22,7 @@
 #'
 #'   shinyApp(
 #'     ui = fluidPage(br(),
-#'       tip(actionButton("btn", "hover me"), "Click to count", id = "btn_tip")
+#'       tip(actionButton("btn", "hover me"), "Not clicked yet", tip_id = "btn_tip")
 #'     ),
 #'     server = function(input, output, session) {
 #'       observeEvent(input$btn, {
@@ -45,33 +33,16 @@
 #' }
 #'
 #' @export
-tip_update <- function(
-    id,
-    content = NULL,
-    content_disabled = NULL,
-    position = NULL,
-    width = NULL,
-    theme = NULL,
-    session = shiny::getDefaultReactiveDomain()) {
-  if (missing(id) || is.null(id)) {
-    stop("tip_update: Must provide `id`", call. = FALSE)
+tip_update <- function(tip_id, content = NULL, content_disabled = NULL,
+                       session = shiny::getDefaultReactiveDomain()) {
+  texts <- Filter(Negate(is.null), list(content = content, content_disabled = content_disabled))
+  for (text in texts) {
+    if (!is_removal(text)) check_text(text)
   }
-  check_id(id)
-  if (is.null(session)) {
-    stop("tip_update: must be called from inside a Shiny server function", call. = FALSE)
-  }
-  if (is_removal(content) && is_removal(content_disabled)) {
+  if (length(texts) == 2 && all(vapply(texts, is_removal, logical(1)))) {
     stop("tip_update: a tooltip must keep either `content` or `content_disabled`", call. = FALSE)
   }
 
-  spec <- tip_spec(
-    content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, allow_removal = TRUE
-  )
-
-  # `NA` entries reach the browser as `null`, which is how it is told to drop an attribute
-  session$sendCustomMessage("shinytip-update", list(
-    id = session$ns(id), attrs = spec$attrs, style = spec$style
-  ))
-  invisible(NULL)
+  # Texts that were left out are not sent at all, and `NA` reaches the browser as `null`
+  session$sendCustomMessage("shinytip-update", c(list(id = session$ns(tip_id)), texts))
 }

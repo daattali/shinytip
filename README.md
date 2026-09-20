@@ -142,7 +142,7 @@ The tooltip text can include emojis, and you can use `\n` to force a line break,
 | `tip_icon()` | Create a question-mark icon that shows a tooltip. |
 | `tip_input()` | Add a question-mark icon with a tooltip to the end of an input's label. |
 | `tip_theme()` | Bundle a set of appearance options (colours, sizes, etc.) so that they can be defined once and reused. |
-| `tip_update()` | Change a tooltip's text or appearance. |
+| `tip_update()` | Change the text of a tooltip from the server. |
 
 [Check out the demo app](https://daattali.com/shiny/shinytip-demo/) to see all of these in action and to generate your own tooltips.
 
@@ -235,28 +235,27 @@ If you only provide `content_disabled`, the tooltip is shown *only* while the in
 
 <h2 id="update">Updating a tooltip</h2>
 
-To change a tooltip, it must be given an `id` when created, and use `tip_update()` in the server.
+To change a tooltip's text while the app is running, give it a `tip_id` and use `tip_update()` in the server.
 
 ```r
 library(shiny)
 
 ui <- fluidPage(
-  actionButton("btn", "Click me") |>
-    tip("You haven't clicked yet", id = "btn_tip", position = "right")
+  actionButton("btn", "Click me") |> tip("You haven't clicked yet", tip_id = "btn_tip")
 )
 
 server <- function(input, output, session) {
-  # observeEvent(input$btn, {
-  #   tip_update("btn_tip", content = paste("You clicked", input$btn, "times"))
-  # })
+  observeEvent(input$btn, {
+    tip_update("btn_tip", content = paste("You clicked", input$btn, "times"))
+  })
 }
 
 shinyApp(ui, server)
 ```
 
-The `id` belongs to the *tooltip*, not to the tag it's attached to, so it can safely be the same as the `inputId` of the input it's sitting on. This also means you don't have to think about where the tooltip actually ended up: whether it's on an input, on a `<span>` around some text, or on a question-mark icon inside a label, `tip_update()` finds it the same way.
+The `tip_id` belongs to the *tooltip*, so it works the same wherever the tooltip ended up (on an input, on some text, or on an icon in a label), and it is separate from the tag's own `id`.
 
-Along with the text, you can update `position`, `width`, and the `theme`. Anything you don't pass is left alone, and the change takes effect immediately, even if the tooltip happens to be open at that moment.
+Each of the two texts can be changed, added, or removed: leave an argument out to keep it, or pass `NA` to remove it. For example, `tip_update("btn_tip", content_disabled = "Not allowed right now")` starts showing that text while the input is disabled, and `tip_update("btn_tip", content_disabled = NA)` goes back to a regular tooltip.
 
 <h2 id="where">Where {shinytip} works</h2>
 

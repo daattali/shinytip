@@ -98,24 +98,6 @@ ui <- fluidPage(
     column(
       12, h3("Generated code"), verbatimTextOutput("code")
     )
-  ),
-
-  fluidRow(
-    column(
-      12,
-      h3("Updating a tooltip"),
-      p("Give a tooltip an", tags$code("id"), "and you can change it from the server with",
-        tags$code("tip_update()"), "without re-rendering anything."),
-      shinytip::tip(
-        actionButton("update_demo", "Hover me!"),
-        "I'm the original text",
-        id = "update_demo_tip",
-        wrap_tag = TRUE
-      ),
-      br(), br(),
-      textInput("new_content", "New text", "I'm the new text", width = "300px"),
-      actionButton("update_btn", "Update the tooltip", class = "btn-primary")
-    )
   )
 )
 
@@ -163,11 +145,6 @@ server <- function(input, output, session) {
 
   output$tooltip <- renderUI({
     eval(parse(text = code()))
-  })
-
-  observeEvent(input$update_btn, {
-    req(nzchar(trimws(input$new_content)))
-    shinytip::tip_update("update_demo_tip", content = input$new_content)
   })
 }
 

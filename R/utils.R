@@ -53,39 +53,11 @@ is_checkbox <- function(tag) {
   is_checkbox
 }
 
-is_string <- function(x) {
-  is.character(x) && length(x) == 1L && !is.na(x)
-}
-
-# `NA` is how a caller asks for a tooltip option to be dropped rather than changed
-is_removal <- function(x) {
-  length(x) == 1L && is.na(x)
-}
-
-check_text <- function(x, allow_removal = FALSE) {
+check_text <- function(x) {
   if (is.null(x)) return()
-  if (allow_removal && is_removal(x)) return()
-  if (!is_string(x) || !nzchar(trimws(x))) {
+  if (!is.character(x) || length(x) != 1L || is.na(x) || !nzchar(trimws(x))) {
     stop("tip: `content` and `content_disabled` must be single non-empty strings", call. = FALSE)
   }
-}
-
-check_id <- function(id) {
-  if (is.null(id)) return()
-  if (!is_string(id) || !nzchar(trimws(id))) {
-    stop("tip: `id` must be a single non-empty string", call. = FALSE)
-  }
-}
-
-# Tooltip text keeps its line breaks only when balloon.css is told to expect them
-has_newline <- function(...) {
-  texts <- Filter(is_string, list(...))
-  any(vapply(texts, grepl, logical(1), pattern = "\n", fixed = TRUE))
-}
-
-# Drop the entries that stand for "this attribute/property should not be present"
-drop_removals <- function(x) {
-  x[!vapply(x, is_removal, logical(1))]
 }
 
 # A bare number in a theme is taken to mean pixels
@@ -97,11 +69,10 @@ question_icon <- function(solid) {
   shiny::icon("question-circle", class = if (solid) "fa-solid")
 }
 
-# The CSS is all a tooltip needs. The JavaScript is only attached to tooltips that were given
-# an `id`, so that apps that never call `tip_update()` stay free of JavaScript.
-shinytip_dependencies <- function(updatable) {
+# The JavaScript is only needed by tooltips that can be updated, so that apps that never call
+# `tip_update()` stay free of JavaScript
+shinytip_dependencies <- function(updatable = FALSE) {
   if (is.null(.shinytipglobals$deps)) {
-    version <- as.character(utils::packageVersion("shinytip"))
     .shinytipglobals$deps <- list(
       htmltools::htmlDependency(
         name = "balloon-css",
@@ -112,19 +83,27 @@ shinytip_dependencies <- function(updatable) {
       ),
       htmltools::htmlDependency(
         name = "shinytip",
-        version = version,
+        version = as.character(utils::packageVersion("shinytip")),
         package = "shinytip",
         src = "assets/css",
         stylesheet = "shinytip.css"
       )
     )
-    .shinytipglobals$update_dep <- htmltools::htmlDependency(
+  }
+  if (updatable) {
+    update_dep <- htmltools::htmlDependency(
       name = "shinytip-update",
-      version = version,
+      version = as.character(utils::packageVersion("shinytip")),
       package = "shinytip",
       src = "assets/js",
       script = "shinytip.js"
     )
+    return(c(.shinytipglobals$deps, list(update_dep)))
   }
-  c(.shinytipglobals$deps, if (updatable) list(.shinytipglobals$update_dep))
+  .shinytipglobals$deps
+}
+
+# `NA` is how a caller asks for a text to be removed
+is_removal <- function(x) {
+  is.atomic(x) && length(x) == 1L && is.na(x)
 }

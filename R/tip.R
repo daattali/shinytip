@@ -55,9 +55,9 @@
 #' passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
 #' tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
 #' because the extra `<div>` can affect the UI layout.
-#' @param id An optional name for the tooltip, so that it can be modified from the server with
-#' [tip_update()]. This is the tooltip's own name and is unrelated to the `inputId` of any input
-#' it is attached to, so the two may safely be the same. In a Shiny module, wrap it in `ns()`.
+#' @param tip_id An optional name for the tooltip, which lets you change its text from the server
+#' with [tip_update()]. This is separate from the `id` attribute of the tag, which can still be set
+#' through `...`. In a Shiny module, wrap it in `ns()`.
 #' @param ... Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.
 #' @return A Shiny tag that supports tooltips.
 #' @seealso [tip_input()], [tip_icon()], [tip_theme()], [tip_update()]
@@ -89,12 +89,11 @@ tip <- function(
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
     wrap_tag = getOption("shinytip.wrap_tag", FALSE),
-    id = NULL,
+    tip_id = NULL,
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, remote = FALSE,
-    id = id, ...
+    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, remote = FALSE, tip_id = tip_id, ...
   )
 }
 
@@ -110,7 +109,7 @@ tip <- function(
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @param ... Additional attributes to pass to the question-mark icon.
 #' @return A Shiny icon tag that has a tooltip.
-#' @seealso [tip()], [tip_input()], [tip_theme()], [tip_update()]
+#' @seealso [tip()], [tip_input()], [tip_theme()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -132,7 +131,7 @@ tip_icon <- function(
     theme = tip_theme(),
     click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
-    id = NULL,
+    tip_id = NULL,
     ...) {
   if (missing(content)) {
     stop("tip_icon: Must provide `content`", call. = FALSE)
@@ -150,7 +149,7 @@ tip_icon <- function(
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = FALSE, id = id, ...
+    click = click, remote = FALSE, tip_id = tip_id, ...
   )
 }
 
@@ -163,7 +162,7 @@ tip_icon <- function(
 #' @param tag A Shiny input tag.
 #' @param ... Additional attributes to pass to the question-mark icon added to the label.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
-#' @seealso [tip()], [tip_icon()], [tip_theme()], [tip_update()]
+#' @seealso [tip()], [tip_icon()], [tip_theme()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -191,7 +190,7 @@ tip_input <- function(
     theme = tip_theme(),
     click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
-    id = NULL,
+    tip_id = NULL,
     ...) {
   if (!inherits(tag, "shiny.tag")) {
     stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
@@ -209,7 +208,7 @@ tip_input <- function(
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = !is.null(content_disabled), id = id, ...
+    click = click, remote = TRUE, tip_id = tip_id, ...
   )
 
   found_label <- FALSE
@@ -235,74 +234,51 @@ tip_input <- function(
   tag
 }
 
-### Tooltip options, translated into the HTML attributes and CSS properties that drive the
-### tooltip. Only the options that are given end up in the result, which lets this serve both
-### `build_tip()` (where every option has a value) and `tip_update()` (where only the options
-### being changed are given). An `NA` value means the attribute/property should be absent.
-tip_spec <- function(content = NULL, content_disabled = NULL, position = NULL,
-                     width = NULL, theme = NULL, allow_removal = FALSE) {
-  attrs <- list()
-  style <- list()
-
-  check_text(content, allow_removal)
-  check_text(content_disabled, allow_removal)
-  if (!is.null(content)) {
-    attrs[["data-shinytip-label"]] <- content
-  }
-  if (!is.null(content_disabled)) {
-    attrs[["data-shinytip-content-disabled"]] <- content_disabled
-  }
-
-  if (!is.null(position)) {
-    if (!is_string(position) || !position %in% names(shinytip_positions)) {
-      stop("tip: `position` must be one of: [", toString(names(shinytip_positions)), "]",
-           call. = FALSE)
-    }
-    attrs[["data-balloon-pos"]] <- unname(shinytip_positions[[position]])
-  }
-
-  if (!is.null(width)) {
-    if (!is_string(width) || !width %in% names(shinytip_widths)) {
-      stop("tip: `width` must be one of: [", toString(names(shinytip_widths)), "]", call. = FALSE)
-    }
-    # "line" is the default width, expressed by the attribute being absent
-    attrs[["data-balloon-length"]] <-
-      if (width == "line") NA else unname(shinytip_widths[[width]])
-  }
-
-  if (!is.null(theme)) {
-    if (!inherits(theme, "shinytip_theme")) {
-      stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
-    }
-    style[["--balloon-color"]] <- theme$bg
-    style[["--balloon-text-color"]] <- theme$fg
-    style[["--balloon-font-size"]] <- css_px(theme$fontsize)
-    style[["--balloon-border-radius"]] <- css_px(theme$radius)
-    style[["--balloon-move"]] <- css_px(theme$move)
-    style[["cursor"]] <- if (theme$pointer) NA else "inherit"
-    attrs[["data-balloon-blunt"]] <- if (theme$animate) NA else ""
-  }
-
-  list(attrs = attrs, style = style)
-}
-
 ### The actual workhorse of building the tooltip
 build_tip <- function(tag, content, content_disabled, position, width, theme, wrap_tag,
-                      click, remote, id = NULL, ...) {
-  if (is.null(theme)) {
+                      click, remote, tip_id, ...) {
+  if (!inherits(theme, "shinytip_theme")) {
     stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
   }
+  bg <- theme$bg
+  fg <- theme$fg
+  fontsize <- css_px(theme$fontsize)
+  radius <- css_px(theme$radius)
+  animate <- theme$animate
+  move <- css_px(theme$move)
+  pointer <- theme$pointer
+
+  if (!position %in% names(shinytip_positions)) {
+    stop("tip: `position` must be one of: [", toString(names(shinytip_positions)), "]", call. = FALSE)
+  }
+  position <- shinytip_positions[[position]]
+
+  if (!width %in% names(shinytip_widths)) {
+    stop("tip: `width` must be one of: [", toString(names(shinytip_widths)), "]", call. = FALSE)
+  }
+  width <- shinytip_widths[[width]]
+
   if (!is.logical(wrap_tag) || length(wrap_tag) != 1L || is.na(wrap_tag)) {
     stop("tip: `wrap_tag` must be either `TRUE` or `FALSE`", call. = FALSE)
   }
+
   if (is.null(content) && is.null(content_disabled)) {
     stop("tip: Must provide `content` or `content_disabled`", call. = FALSE)
   }
-  check_id(id)
+  check_text(content)
+  check_text(content_disabled)
+  newlines <- (!is.null(content) && grepl("\n", content)) ||
+    (!is.null(content_disabled) && grepl("\n", content_disabled))
 
-  spec <- tip_spec(
-    content = content, content_disabled = content_disabled,
-    position = position, width = width, theme = theme
+  only_disabled <- is.null(content)
+
+  css <- paste0(
+    "--balloon-color: ", bg, "; ",
+    "--balloon-text-color: ", fg, "; ",
+    "--balloon-font-size: ", fontsize, "; ",
+    "--balloon-border-radius: ", radius, "; ",
+    "--balloon-move: ", move, ";",
+    if (!pointer) " cursor: inherit;"
   )
 
   if (is.null(tag) || identical(tag, NA) || length(tag) == 0) {
@@ -322,32 +298,32 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     tag <- shiny::span(tag)
   }
 
-  attrs <- spec$attrs
   # An empty `aria-label` is kept so that balloon.css works, but the actual tooltip
   # text comes from `data-shinytip-label`. This is done so that we don't override
   # the accessible name of the element.
-  attrs[["aria-label"]] <- ""
-  attrs[["data-balloon-break"]] <-
-    if (has_newline(content, content_disabled)) "" else NA
-  # The tooltip gets an identity of its own rather than borrowing the tag's `id`, because
-  # the tag carrying the tooltip is not always the one the user named (it may be a wrapper
-  # we created, or an icon inside an input's label), and because a Shiny input on the same
-  # tag needs its `id` left alone. `tip_update()` looks tooltips up by this attribute.
-  attrs[["data-shinytip-id"]] <- id
-  attrs[["class"]] <- paste(
-    c("shinytip", if (remote) "shinytip-remote"), collapse = " "
+  tag <- shiny::tagAppendAttributes(
+    tag,
+    class = "shinytip",
+    `aria-label` = "",
+    `data-balloon-nofocus` = NA,   # don't show after clicking, re-enable for keyboard focus using css
+    `data-shinytip-label` = content,
+    `data-shinytip-content-disabled` = content_disabled,
+    `data-shinytip-id` = tip_id,
+    `data-balloon-pos` = position,
+    `data-balloon-break` = if (newlines) NA,
+    style = css,
+    ...
   )
-  attrs[["style"]] <- css_declarations(spec$style)
 
-  tag <- do.call(
-    shiny::tagAppendAttributes,
-    c(list(tag), drop_removals(attrs), list(...))
-  )
+  if (remote) {
+    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-remote")
+  }
+
 
   # `click` is ignored when `content_disabled` is the only text, because CSS already drives
   # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and
   # reopen the tooltip by itself the next time it was disabled
-  if (click && !is.null(content)) {
+  if (click && !only_disabled) {
     tag <- shiny::tagAppendAttributes(
       tag,
       class = "shinytip-hide",
@@ -356,16 +332,18 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     )
   }
 
-  htmltools::attachDependencies(
-    tag, shinytip_dependencies(updatable = !is.null(id)), append = TRUE
-  )
-}
-
-# Turn a named list of CSS properties into a `style` attribute
-css_declarations <- function(style) {
-  style <- drop_removals(style)
-  if (length(style) == 0) {
-    return(NA)
+  if (width != "line") {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      `data-balloon-length` = width
+    )
   }
-  paste0(names(style), ": ", unlist(style), ";", collapse = " ")
+  if (!animate) {
+    tag <- shiny::tagAppendAttributes(
+      tag,
+      `data-balloon-blunt` = NA
+    )
+  }
+
+  htmltools::attachDependencies(tag, shinytip_dependencies(updatable = !is.null(tip_id)), append = TRUE)
 }
