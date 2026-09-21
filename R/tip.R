@@ -212,9 +212,6 @@ tip_input <- function(
     position = position, width = width, theme = theme, wrap_tag = FALSE,
     click = click, tip_id = tip_id, ...
   )
-  # The icon sits in the input's label, so it is never disabled itself. `shinytip-remote` tells
-  # the CSS to read the disabled state from the surrounding input container instead. It is added
-  # unconditionally so that a disabled text can also be added later with `tip_update()`.
   icon <- shiny::tagAppendAttributes(icon, class = "shinytip-remote")
 
   found_label <- FALSE

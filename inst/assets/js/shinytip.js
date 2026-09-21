@@ -3,29 +3,28 @@
 // adding or removing a text is just setting or removing its attribute. A text that is missing
 // from the message is left as it is, and one that is `null` is removed.
 Shiny.addCustomMessageHandler("shinytip-update", function(msg) {
-  var texts = { content: "data-shinytip-label", content_disabled: "data-shinytip-content-disabled" };
-
   document.querySelectorAll("[data-shinytip-id]").forEach(function(el) {
     if (el.getAttribute("data-shinytip-id") !== msg.id) return;
 
-    var next = {};
-    Object.keys(texts).forEach(function(key) {
-      next[texts[key]] = key in msg ? msg[key] : el.getAttribute(texts[key]);
-    });
-    var attrs = Object.keys(next);
-    if (attrs.every(function(attr) { return next[attr] === null; })) {
+    // The new value of each text: what the message carries (a string, or null to remove), or
+    // the current attribute when the message leaves that text out.
+    var label = "content" in msg ? msg.content : el.getAttribute("data-shinytip-label");
+    var disabled = "content_disabled" in msg ?
+      msg.content_disabled : el.getAttribute("data-shinytip-content-disabled");
+
+    if (label === null && disabled === null) {
       console.warn("shinytip: a tooltip needs at least one text, so '" + msg.id + "' was not updated");
       return;
     }
 
-    attrs.forEach(function(attr) {
-      if (next[attr] === null) el.removeAttribute(attr); else el.setAttribute(attr, next[attr]);
-    });
+    apply(el, "data-shinytip-label", label);
+    apply(el, "data-shinytip-content-disabled", disabled);
     // A tooltip only keeps its line breaks when balloon.css is told to expect them
-    if (attrs.some(function(attr) { return /\n/.test(next[attr] || ""); })) {
-      el.setAttribute("data-balloon-break", "");
-    } else {
-      el.removeAttribute("data-balloon-break");
-    }
+    var multiline = /\n/.test(label || "") || /\n/.test(disabled || "");
+    apply(el, "data-balloon-break", multiline ? "" : null);
   });
+
+  function apply(el, attr, value) {
+    if (value === null) el.removeAttribute(attr); else el.setAttribute(attr, value);
+  }
 });

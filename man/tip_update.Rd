@@ -2,7 +2,7 @@
 % Please edit documentation in R/tip_update.R
 \name{tip_update}
 \alias{tip_update}
-\title{Update the text of a tooltip from the server}
+\title{Update the text of a tooltip}
 \usage{
 tip_update(
   tip_id,
@@ -23,16 +23,14 @@ the current text, or use \code{NA} to remove it.}
 \item{session}{The Shiny session object. You should not need to provide this.}
 }
 \value{
-Nothing. Called for the side effect of updating a tooltip in the browser.
+Nothing. Called for the side effect of updating a tooltip in the app.
 }
 \description{
 Change the text of a tooltip that was given a \code{tip_id} when it was created with \code{\link[=tip]{tip()}},
-\code{\link[=tip_icon]{tip_icon()}}, or \code{\link[=tip_input]{tip_input()}}. The change is applied immediately, even while the tooltip is
-being shown. If several tooltips share the same \code{tip_id}, they are all updated.\cr\cr
-Each of the two texts can be changed, added, or removed, which means a tooltip can also change
-how it behaves: for example, adding \code{content_disabled} to a tooltip that only has \code{content} makes
-it show a different text while the input is disabled. See the \emph{Disabled inputs} section of
-\code{\link[=tip]{tip()}} for what each combination of the two texts means.
+\code{\link[=tip_icon]{tip_icon()}}, or \code{\link[=tip_input]{tip_input()}}. The change is applied immediately, even if the tooltip is
+being shown.\cr\cr
+Both \code{content} and \code{content_disabled} can be changed, added, or removed. See the \emph{Disabled inputs}
+section of \code{\link[=tip]{tip()}} for what each combination of the two texts means.
 }
 \examples{
 if (interactive()) {

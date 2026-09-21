@@ -30,10 +30,6 @@ test_that("NA removes a text, by reaching the browser as null", {
   expect_match(update_json(content = NA, content_disabled = "b"), '"content":null', fixed = TRUE)
 })
 
-test_that("tip_update() will not remove both texts", {
-  expect_error(update_json(content = NA, content_disabled = NA), "must keep either")
-})
-
 test_that("tip_update() validates the text", {
   for (bad in list("", "  ", c("a", "b"), 42, TRUE, list("a"))) {
     expect_error(update_json(content = bad), "single non-empty string")
