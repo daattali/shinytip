@@ -44,9 +44,8 @@ regardless of this parameter.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 
-\item{tip_id}{An optional name for the tooltip, which lets you change its text from the server
-with \code{\link[=tip_update]{tip_update()}}. This is separate from the \code{id} attribute of the tag, which can still be set
-through \code{...}. In a Shiny module, wrap it in \code{ns()}.}
+\item{tip_id}{An optional ID for the tooltip, which is only needed if you want to use
+\code{\link[=tip_update]{tip_update()}} to update the tooltip's text from the server. In a Shiny module, wrap it in \code{ns()}.}
 
 \item{...}{Additional attributes to pass to the question-mark icon added to the label.}
 }

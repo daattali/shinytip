@@ -55,9 +55,8 @@
 #' passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
 #' tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
 #' because the extra `<div>` can affect the UI layout.
-#' @param tip_id An optional name for the tooltip, which lets you change its text from the server
-#' with [tip_update()]. This is separate from the `id` attribute of the tag, which can still be set
-#' through `...`. In a Shiny module, wrap it in `ns()`.
+#' @param tip_id An optional ID for the tooltip, which is only needed if you want to use
+#' [tip_update()] to update the tooltip's text from the server. In a Shiny module, wrap it in `ns()`.
 #' @param ... Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.
 #' @return A Shiny tag that supports tooltips.
 #' @seealso [tip_input()], [tip_icon()], [tip_theme()], [tip_update()]
@@ -93,7 +92,7 @@ tip <- function(
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, remote = FALSE, tip_id = tip_id, ...
+    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, tip_id = tip_id, ...
   )
 }
 
@@ -148,7 +147,7 @@ tip_icon <- function(
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = FALSE, tip_id = tip_id, ...
+    click = click, tip_id = tip_id, ...
   )
 }
 
@@ -211,8 +210,12 @@ tip_input <- function(
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = TRUE, tip_id = tip_id, ...
+    click = click, tip_id = tip_id, ...
   )
+  # The icon sits in the input's label, so it is never disabled itself. `shinytip-remote` tells
+  # the CSS to read the disabled state from the surrounding input container instead. It is added
+  # unconditionally so that a disabled text can also be added later with `tip_update()`.
+  icon <- shiny::tagAppendAttributes(icon, class = "shinytip-remote")
 
   found_label <- FALSE
   for (idx in seq_along(tag$children)) {
@@ -239,7 +242,7 @@ tip_input <- function(
 
 ### The actual workhorse of building the tooltip
 build_tip <- function(tag, content, content_disabled, position, width, theme, wrap_tag,
-                      click, remote, tip_id, ...) {
+                      click, tip_id, ...) {
   if (!inherits(theme, "shinytip_theme")) {
     stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
   }
@@ -272,8 +275,6 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
   check_text(content_disabled)
   newlines <- (!is.null(content) && grepl("\n", content)) ||
     (!is.null(content_disabled) && grepl("\n", content_disabled))
-
-  only_disabled <- is.null(content)
 
   css <- paste0(
     "--balloon-color: ", bg, "; ",
@@ -318,14 +319,10 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     ...
   )
 
-  if (remote) {
-    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-remote")
-  }
-
   # `click` is ignored when `content_disabled` is the only text, because CSS already drives
   # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and
   # reopen the tooltip by itself the next time it was disabled
-  if (click && !only_disabled) {
+  if (click && !is.null(content)) {
     tag <- shiny::tagAppendAttributes(
       tag,
       class = "shinytip-hide",
