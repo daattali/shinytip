@@ -29,9 +29,8 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 animation, cursor).}
 
 \item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip is only
-shown once the icon is clicked. Ignored when \code{content_disabled} is given without \code{content}.
-On mobile/touch devices that do not support hover, tooltips are always shown on click
-regardless of this parameter.}
+shown once the icon is clicked. On mobile/touch devices that do not support hover, tooltips are
+always shown on click regardless of this parameter.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 
@@ -62,5 +61,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_theme]{tip_theme()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_input]{tip_input()}}, \code{\link[=tip_theme]{tip_theme()}}, \code{\link[=tip_update]{tip_update()}}
 }

@@ -103,13 +103,12 @@ tip <- function(
 #' @inheritParams tip
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
 #' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
-#' shown once the icon is clicked. Ignored when `content_disabled` is given without `content`.
-#' On mobile/touch devices that do not support hover, tooltips are always shown on click
-#' regardless of this parameter.
+#' shown once the icon is clicked. On mobile/touch devices that do not support hover, tooltips are
+#' always shown on click regardless of this parameter.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @param ... Additional attributes to pass to the question-mark icon.
 #' @return A Shiny icon tag that has a tooltip.
-#' @seealso [tip()], [tip_input()], [tip_theme()]
+#' @seealso [tip()], [tip_input()], [tip_theme()], [tip_update()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -159,10 +158,14 @@ tip_icon <- function(
 #' @inheritParams tip
 #' @inheritParams tip_icon
 #' @inheritSection tip Disabled inputs
+#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
+#' shown once the icon is clicked. Ignored when `content_disabled` is given without `content`.
+#' On mobile/touch devices that do not support hover, tooltips are always shown on click
+#' regardless of this parameter.
 #' @param tag A Shiny input tag.
 #' @param ... Additional attributes to pass to the question-mark icon added to the label.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
-#' @seealso [tip()], [tip_icon()], [tip_theme()]
+#' @seealso [tip()], [tip_icon()], [tip_theme()], [tip_update()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -318,7 +321,6 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
   if (remote) {
     tag <- shiny::tagAppendAttributes(tag, class = "shinytip-remote")
   }
-
 
   # `click` is ignored when `content_disabled` is the only text, because CSS already drives
   # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and

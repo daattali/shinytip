@@ -85,5 +85,5 @@ if (interactive()) {
 
 }
 \seealso{
-\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}
+\code{\link[=tip]{tip()}}, \code{\link[=tip_icon]{tip_icon()}}, \code{\link[=tip_theme]{tip_theme()}}, \code{\link[=tip_update]{tip_update()}}
 }
