@@ -38,7 +38,7 @@ if (interactive()) {
   library(shinytip)
 
   shinyApp(
-    ui = fluidPage(br(),
+    ui = fluidPage(br(), br(), br(),
       tip(actionButton("btn", "hover me"), "Not clicked yet", tip_id = "btn_tip")
     ),
     server = function(input, output, session) {

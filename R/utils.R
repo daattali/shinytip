@@ -90,19 +90,27 @@ shinytip_dependencies <- function(updatable = FALSE) {
       )
     )
   }
-  if (updatable) {
-    if (is.null(.shinytipglobals$update_dep)) {
-      .shinytipglobals$update_dep <- htmltools::htmlDependency(
-        name = "shinytip-update",
-        version = as.character(utils::packageVersion("shinytip")),
-        package = "shinytip",
-        src = "assets/js",
-        script = "shinytip.js"
+
+  if (updatable && is.null(.shinytipglobals$update_dep)) {
+    .shinytipglobals$update_dep <- c(
+      .shinytipglobals$deps,
+      list(
+        htmltools::htmlDependency(
+          name = "shinytip-update",
+          version = as.character(utils::packageVersion("shinytip")),
+          package = "shinytip",
+          src = "assets/js",
+          script = "shinytip.js"
+        )
       )
-    }
-    return(c(.shinytipglobals$deps, list(.shinytipglobals$update_dep)))
+    )
   }
-  .shinytipglobals$deps
+
+  if (updatable) {
+    .shinytipglobals$update_dep
+  } else {
+    .shinytipglobals$deps
+  }
 }
 
 # `NA` is how a caller asks for a text to be removed

@@ -241,21 +241,20 @@ To change a tooltip's text while the app is running, give it a `tip_id` and use 
 library(shiny)
 
 ui <- fluidPage(
-  actionButton("btn", "Click me") |> tip("You haven't clicked yet", tip_id = "btn_tip")
+  actionButton("btn", "Click me") |>
+    tip("You haven't clicked yet", tip_id = "btn_tip", position = "right")
 )
 
 server <- function(input, output, session) {
   observeEvent(input$btn, {
-    tip_update("btn_tip", content = paste("You clicked", input$btn, "times"))
+    tip_update("btn_tip", paste("You clicked", input$btn, "times"))
   })
 }
 
 shinyApp(ui, server)
 ```
 
-The `tip_id` belongs to the *tooltip*, so it works the same wherever the tooltip ended up (on an input, on some text, or on an icon in a label), and it is separate from the tag's own `id`.
-
-Each of the two texts can be changed, added, or removed: leave an argument out to keep it, or pass `NA` to remove it. For example, `tip_update("btn_tip", content_disabled = "Not allowed right now")` starts showing that text while the input is disabled, and `tip_update("btn_tip", content_disabled = NA)` goes back to a regular tooltip.
+Both `content` and `content_disabled` can be changed, added, or removed: leave an argument out to keep it, or use `NA` to remove it. For example, `tip_update("btn_tip", content_disabled = "Not allowed right now")` starts showing that text while the input is disabled, and `tip_update("btn_tip", content_disabled = NA)` goes back to a regular tooltip.
 
 <h2 id="where">Where {shinytip} works</h2>
 

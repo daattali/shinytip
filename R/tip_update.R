@@ -36,8 +36,6 @@ tip_update <- function(tip_id, content = NULL, content_disabled = NULL,
   if (!is.null(content) && !is_removal(content)) check_text(content)
   if (!is.null(content_disabled) && !is_removal(content_disabled)) check_text(content_disabled)
 
-  # A text left out (NULL) is not sent, so the browser keeps it; `NA` is sent as `null`,
-  # which tells the browser to remove it.
   msg <- list(id = session$ns(tip_id))
   if (!is.null(content)) msg$content <- content
   if (!is.null(content_disabled)) msg$content_disabled <- content_disabled
