@@ -4,17 +4,15 @@ ui <- fluidPage(fluidRow(
   column(
     offset = 2,
     width = 3,
-    shinytip::tip_icon("This is the explanation", position = "bottom"), br(),
-    "This one requires a click",
-    shinytip::tip_icon("Red background", position = "right", theme = shinytip::tip_theme(bg = "red"), click = TRUE),
+    shinytip::tip_icon("This is the explanation on bottom", position = "bottom"), br(),
+    shinytip::tip_icon("Red, right", position = "right", theme = shinytip::tip_theme(bg = "red")),
     shinytip::tip_input(
       textInput("text", "Name"),
       "Enter your full name"
     ),
     shinytip::tip_input(
-      dateInput("date", "DOB (click)"),
-      "Enter your date of birth",
-      click = TRUE
+      dateInput("date", "DOB"),
+      "Enter your date of birth"
     ),
     shinytip::tip_input(
       radioButtons("radio", "Label", c("a", "b")),
@@ -47,7 +45,6 @@ ui <- fluidPage(fluidRow(
         position = "left"
       ),
     ),
-    "The following plot is spinner wrapped",
     shinytip::tip(
       shinycssloaders::withSpinner(
         plotOutput("plot3", height = "200")

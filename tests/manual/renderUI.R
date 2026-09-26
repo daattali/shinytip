@@ -10,7 +10,7 @@ server <- function(input, output, session) {
     req(input$click)
 
     tagList(
-      "no tooltip here",
+      "no tooltip here", br(),
       shinytip::tip("but yes here", "hello!")
     )
   })

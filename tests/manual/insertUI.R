@@ -7,7 +7,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   observeEvent(input$click, {
     insertUI("body", "beforeEnd", ui = tagList(
-      "no tooltip here",
+      "no tooltip here", br(),
       shinytip::tip("but yes here", "hello!")
     ))
   })

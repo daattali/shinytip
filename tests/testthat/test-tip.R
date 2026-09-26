@@ -18,7 +18,7 @@ test_that("tooltip text must be a single non-empty string", {
 test_that("tip() without content_disabled is unchanged", {
   html <- tip_tag(shiny::div(), "hello")
   expect_match(html, 'data-shinytip-label="hello"')
-  expect_false(grepl("shinytip-disabled-only|shinytip-disabled-swap|data-shinytip-content-disabled", html))
+  expect_false(grepl("data-shinytip-content-disabled", html))
 })
 
 test_that("tip() empties aria-label so it never overrides an element's accessible name", {
@@ -27,50 +27,33 @@ test_that("tip() empties aria-label so it never overrides an element's accessibl
   expect_match(html, 'data-shinytip-label="Saves your work"')
 })
 
-test_that("tip() with only content_disabled shows the disabled text", {
+test_that("tip() with only content_disabled has no regular text", {
   html <- tip_tag(shiny::div(), content_disabled = "why not")
-  expect_match(html, 'data-shinytip-label="why not"')
-  expect_match(html, "shinytip-disabled-only")
-  expect_false(grepl("data-shinytip-content-disabled|shinytip-disabled-swap\"", html))
+  expect_match(html, 'data-shinytip-content-disabled="why not"')
+  expect_false(grepl("data-shinytip-label", html))
 })
 
 test_that("tip() with both texts keeps each in its own attribute", {
   html <- tip_tag(shiny::div(), "hello", "why not")
   expect_match(html, 'data-shinytip-label="hello"')
   expect_match(html, 'data-shinytip-content-disabled="why not"')
-  expect_match(html, "shinytip-disabled-swap")
-  expect_false(grepl("shinytip-disabled-only", html))
 })
 
 test_that("tip_input() marks the icon as reading its state from the container", {
   html <- as.character(tip_input(shiny::textInput("test", "test"), content_disabled = "why not"))
   expect_match(html, "shinytip-remote")
-  expect_match(html, "shinytip-disabled-only")
+  expect_false(grepl("data-shinytip-label", html))
 })
 
-test_that("tip_input() without content_disabled is unchanged", {
+test_that("tip_input() always reads its disabled state from the container, so that a disabled text can be added later", {
   html <- as.character(tip_input(shiny::textInput("test", "test"), "hello"))
-  expect_false(grepl("shinytip-remote", html))
+  expect_match(html, "shinytip-remote")
 })
 
 test_that("tip_input() works on checkboxes, which have no <label> of their own", {
   html <- as.character(tip_input(shiny::checkboxInput("test", "test"), "hello", "why not"))
   expect_match(html, "shinytip-remote")
   expect_match(html, 'data-shinytip-content-disabled="why not"')
-})
-
-test_that("click is ignored when content_disabled is the only text", {
-  direct <- as.character(tip_icon(content = "hello", click = TRUE))
-  expect_match(direct, "onclick")
-  direct <- as.character(
-    tip_input(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
-  )
-  expect_false(grepl("onclick", direct))
-
-  remote <- as.character(
-    tip_input(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
-  )
-  expect_false(grepl("onclick", remote))
 })
 
 test_that("every exported function returns a shiny tag", {
@@ -211,23 +194,16 @@ test_that("tip() requires a tag", {
   expect_error(tip("y", "y"), NA)
 })
 
-test_that("click is only accepted by tip_icon() and tip_input()", {
-  expect_match(as.character(tip_icon("y", click = TRUE)), "onclick")
-  expect_match(as.character(tip_input(shiny::textInput("t", "T"), "y", click = TRUE)), "onclick")
-  expect_error(tip("x", "y", click = TRUE))
-})
-
 test_that("defaults can be set with global options", {
   withr::with_options(
     list(shinytip.position = "right", shinytip.width = "l",
-         shinytip.bg = "pink", shinytip.solid = TRUE, shinytip.click = TRUE),
+         shinytip.bg = "pink", shinytip.solid = TRUE),
     {
       html <- tip_tag("x", "y")
       expect_match(html, 'data-balloon-pos="right"')
       expect_match(html, 'data-balloon-length="large"')
       expect_match(html, "--balloon-color: pink", fixed = TRUE)
       expect_match(as.character(tip_icon("y")), "fa-solid")
-      expect_match(as.character(tip_icon("y")), "onclick")
     }
   )
 })
@@ -268,4 +244,26 @@ test_that("wrap_tag is rejected by tip_icon() and tip_input()", {
   expect_error(tip_icon("y", wrap_tag = TRUE), "`wrap_tag` is not supported")
   expect_error(tip_input(shiny::textInput("t", "T"), "y", wrap_tag = TRUE),
                "`wrap_tag` is not supported")
+})
+
+test_that("`tip_id` names the tooltip without touching the tag's own id", {
+  html <- tip_tag(shiny::actionButton("btn", "go"), "y", tip_id = "btn_tip")
+  expect_match(html, 'data-shinytip-id="btn_tip"')
+  expect_match(html, 'id="btn"', fixed = TRUE)
+  expect_match(tip_tag("x", "y", id = "mine", tip_id = "t"), 'id="mine"', fixed = TRUE)
+  expect_false(grepl("data-shinytip-id", tip_tag("x", "y")))
+})
+
+test_that("`tip_id` works on tip_icon() and tip_input()", {
+  expect_match(as.character(tip_icon("y", tip_id = "t")), 'data-shinytip-id="t"')
+  expect_match(as.character(tip_input(shiny::textInput("i", "I"), "y", tip_id = "t")),
+               'data-shinytip-id="t"')
+})
+
+test_that("JavaScript is only attached to tooltips that can be updated", {
+  has_js <- function(tag) {
+    "shinytip-update" %in% vapply(htmltools::renderTags(tag)$dependencies, `[[`, character(1), "name")
+  }
+  expect_false(has_js(tip("x", "y")))
+  expect_true(has_js(tip("x", "y", tip_id = "t")))
 })

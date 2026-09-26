@@ -64,6 +64,7 @@ See the [demo Shiny app](https://daattali.com/shiny/shinytip-demo/) online to pl
 - [Tooltip theme](#themes)
 - [Setting defaults for all tooltips](#defaults)
 - [Tooltips on disabled inputs](#disabled)
+- [Updating a tooltip](#update)
 - [Where {shinytip} works](#where)
 - [Limitations](#limitations)
 - [Similar packages](#similar)
@@ -141,6 +142,7 @@ The tooltip text can include emojis, and you can use `\n` to force a line break,
 | `tip_icon()` | Create a question-mark icon that shows a tooltip. |
 | `tip_input()` | Add a question-mark icon with a tooltip to the end of an input's label. |
 | `tip_theme()` | Bundle a set of appearance options (colours, sizes, etc.) so that they can be defined once and reused. |
+| `tip_update()` | Change the text of a tooltip from the server. |
 
 [Check out the demo app](https://daattali.com/shiny/shinytip-demo/) to see all of these in action and to generate your own tooltips.
 
@@ -161,7 +163,7 @@ remotes::install_github("daattali/shinytip")
 
 <h2 id="customize">Customizing the tooltip</h2>
 
-All three tooltip functions accept these parameters:
+Each tooltip can also be customized with the following parameters:
 
 - **`position`**: Where the tooltip appears in relation to the element. One of `"top"` (default), `"bottom"`, `"left"`, `"right"`, `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`.
 
@@ -169,15 +171,9 @@ All three tooltip functions accept these parameters:
 
 - **`theme`**: A `tip_theme()` object that controls the tooltip's appearance (see the next section).
 
-`tip_icon()` and `tip_input()` accept two more:
+- **`solid`** *(not accepted by `tip()`)*: Use `solid = TRUE` to get a question-mark icon with a solid background.
 
-- **`click`**: By default, the tooltip is shown on hover. Use `click = TRUE` to only show it after the icon is clicked.
-
-- **`solid`**: Use `solid = TRUE` to get a question-mark icon with a solid background.
-
-`tip()` accepts one more:
-
-- **`wrap_tag`**: Use `wrap_tag = TRUE` to wrap the element in a `<div>`. This is the fix for an element that can't carry a tooltip of its own, most often a disabled input (see [Limitations](#limitations)). It's opt-in because the extra `<div>` can affect the UI layout.
+- **`wrap_tag`** *(only accepted by `tip()`)*: Use `wrap_tag = TRUE` to wrap the element in a `<div>`. This can fix a variety of issues, most often a disabled input (see [Limitations](#limitations)). It's opt-in because the extra `<div>` can affect the UI layout.
 
 <h2 id="themes">Tooltip theme</h2>
 
@@ -231,6 +227,29 @@ shinyApp(ui, server)
 
 If you only provide `content_disabled`, the tooltip is shown *only* while the input is disabled. If you provide both `content` and `content_disabled`, the tooltip swaps its text depending on the input's state. Inputs that are disabled with `shinyjs::disable()` are detected automatically.
 
+<h2 id="update">Updating a tooltip</h2>
+
+To change a tooltip's text while the app is running, give it a `tip_id` and use `tip_update()` in the server.
+
+```r
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("btn", "Click me") |>
+    tip("You haven't clicked yet", tip_id = "btn_tip", position = "right")
+)
+
+server <- function(input, output, session) {
+  observeEvent(input$btn, {
+    tip_update("btn_tip", paste("You clicked", input$btn, "times"))
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Both `content` and `content_disabled` can be changed, added, or removed: leave an argument out to keep it, or use `NA` to remove it. For example, `tip_update("btn_tip", content_disabled = "Not allowed right now")` starts showing that text while the input is disabled, and `tip_update("btn_tip", content_disabled = NA)` goes back to a regular tooltip.
+
 <h2 id="where">Where {shinytip} works</h2>
 
 Tooltips have a habit of working nicely in a simple example and then breaking in a real app. {shinytip} was tested in every place I could think of, and it works:
@@ -245,15 +264,17 @@ Tooltips have a habit of working nicely in a simple example and then breaking in
 
 <h2 id="limitations">Limitations</h2>
 
-- The best position for a tooltip is not detected automatically, so a tooltip near the edge of the page can run off-screen and you'll need to choose a different `position` yourself.
+- The best position for a tooltip cannot be detected automatically, so a tooltip near the edge of the page can run off-screen and you'll need to choose a different `position` yourself.
 
 - The tooltip text cannot contain HTML.
 
-- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. Use `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
+- On mobile (and other touch devices), tooltips are shown on click rather than hover.
 
-- On mobile and other touch devices, hovering isn't a supported interaction, so all tooltips are shown on click regardless of the `click` parameter. Dismissing a tooltip is done by tapping elsewhere rather than by tapping the element again.
+- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. This can be fixed by using `wrap_tag = TRUE`.
 
-- If an element loses its opacity when it's disabled, then its tooltip will also lose its opacity. This most commonly affects tooltips on a disabled `actionButton()`. Bootstrap 5 (used by {bslib}) also prevents disabled buttons from having tooltips. Setting `wrap_tag = TRUE` solves both issues, by placing the tooltip on a wrapper element.
+- If an element becomes partially transparent when disabled (such as buttons), then the tooltip will also have the same transparency when the element is disabled. This can be fixed by using `wrap_tag = TRUE`.
+
+- Bootstrap 5 (used by `{bslib}`) prevents disabled buttons from having tooltips on hover. This can be fixed by using `wrap_tag = TRUE`.
 
 <h2 id="similar">Similar packages</h2>
 

@@ -2,11 +2,11 @@
 #'
 #' Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
 #' Tooltips are powered by the project `balloon.css`.\cr\cr
-#' All the theme parameters, along with `position` and `width`, can be set globally in order to use
+#' Most parameters, including the `theme` parameters, can be set globally in order to use
 #' a default setting for all tooltips in your Shiny app. This can be done by setting an R option with
 #' the parameter's name prepended by `"shinytip."`. For example, to set all tooltips to appear on the
 #' right and have a red background, use `options(shinytip.position = "right", shinytip.bg = "red")`.
-#' Only `tag`, `content`, and `content_disabled` cannot be set globally.
+#' Only `tag`, `content`, `content_disabled`, and `tip_id` cannot be set globally.
 #'
 #' Note that when adding a tooltip to an `<img>` tag or an icon (such as fontawesome),
 #' the tag will get wrapped in a `<div>`. When adding a tooltip to plain text, the text is wrapped
@@ -22,21 +22,22 @@
 #' Any inputs disabled with `shinyjs::disable()` are automatically detected.
 #'
 #' @section Limitations:
-#' - The best position for the tooltip cannot be detected automatically.
-#' This means that you may need to adjust the position of the tooltip depending on where it appears
-#' on the page.
+#' - The best position for a tooltip cannot be detected automatically, so a tooltip near the
+#' edge of the page can run off-screen and you'll need to choose a different `position` yourself.
 #'
-#' - The balloon project makes use of pseudo-elements, so if you're trying to
-#' add a tooltip to an element that already has pseudo-elements, it may not work. Use
-#' `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
+#' - The tooltip text cannot contain HTML.
 #'
-#' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
-#' is not a supported interaction.
+#' - On mobile (and other touch devices), tooltips are shown on click rather than hover.
 #'
-#' - If an element loses its opacity when disabled, then the tooltip will also lose its
-#' opacity when the element is disabled. This commonly affects tooltips on disabled `actionButton()`.
-#' Bootstrap 5 (used by `{bslib}`) also prevents disabled buttons from having tooltips on hover.
-#' Both these issues are fixed by `wrap_tag = TRUE`, which moves the tooltip onto a wrapper element.
+#' - Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that
+#' already makes use of pseudo-elements, the two will conflict and you may get unexpected results.
+#' This can be fixed by using `wrap_tag = TRUE`.
+#'
+#' - If an element becomes partially transparent when disabled (such as buttons), then the tooltip will also have the
+#' same transparency when the element is disabled. This can be fixed by using `wrap_tag = TRUE`.
+#'
+#' - Bootstrap 5 (used by `{bslib}`) prevents disabled buttons from having tooltips on hover.
+#' This can be fixed by using `wrap_tag = TRUE`.
 #' @param tag A Shiny tag, tagList, or plain text to add a tooltip to.
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
 #' Use `\n` to force a new line. Can be `NULL` if `content_disabled` is given, in which case
@@ -51,13 +52,15 @@
 #' @param theme A [tip_theme()] object holding the tooltip's appearance (colours, font size,
 #' animation, cursor).
 #' @param wrap_tag If `TRUE`, wrap `tag` in a `<div>` and place the tooltip on that wrapper rather
-#' than on the tag itself. Use this when the tag cannot carry a tooltip of its own: a disabled input
-#' passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
-#' tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
-#' because the extra `<div>` can affect the UI layout.
+#' than on the tag itself. This can be used to fix a variety of different issues: if the tag cannot
+#' carry a tooltip of its own; if a disabled button's tooltip is partially transparent; if a disabled
+#' button in Bootstrap 5 doesn't have a tooltip; if a tag already has pseudo-elements that conflict
+#' with the tooltip.  This behaviour is opt-in because the extra `<div>` can affect the UI layout.
+#' @param tip_id An optional ID for the tooltip, which is only needed if you want to use
+#' [tip_update()] to update the tooltip's text from the server. In a Shiny module, wrap it in `ns()`.
 #' @param ... Additional attributes to pass to the tag, or to the wrapper when the tag gets wrapped.
 #' @return A Shiny tag that supports tooltips.
-#' @seealso [tip_input()], [tip_icon()], [tip_theme()]
+#' @seealso [tip_input()], [tip_icon()], [tip_theme()], [tip_update()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -86,26 +89,23 @@ tip <- function(
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
     wrap_tag = getOption("shinytip.wrap_tag", FALSE),
+    tip_id = NULL,
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, remote = FALSE, ...
+    width = width, theme = theme, wrap_tag = wrap_tag, tip_id = tip_id, ...
   )
 }
 
 #' Create a tooltip icon
 #'
-#' Add a question-mark icon that shows a tooltip when hovered or clicked.
+#' Add a question-mark icon that shows a tooltip when hovered.
 #' @inheritParams tip
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
-#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
-#' shown once the icon is clicked. Ignored when `content_disabled` is given without `content`.
-#' On mobile/touch devices that do not support hover, tooltips are always shown on click
-#' regardless of this parameter.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @param ... Additional attributes to pass to the question-mark icon.
 #' @return A Shiny icon tag that has a tooltip.
-#' @seealso [tip()], [tip_input()], [tip_theme()]
+#' @seealso [tip()], [tip_input()], [tip_theme()], [tip_update()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -125,8 +125,8 @@ tip_icon <- function(
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
-    click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
+    tip_id = NULL,
     ...) {
   if (missing(content)) {
     stop("tip_icon: Must provide `content`", call. = FALSE)
@@ -144,7 +144,7 @@ tip_icon <- function(
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = FALSE, ...
+    tip_id = tip_id, ...
   )
 }
 
@@ -157,7 +157,7 @@ tip_icon <- function(
 #' @param tag A Shiny input tag.
 #' @param ... Additional attributes to pass to the question-mark icon added to the label.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
-#' @seealso [tip()], [tip_icon()], [tip_theme()]
+#' @seealso [tip()], [tip_icon()], [tip_theme()], [tip_update()]
 #' @examples
 #' if (interactive()) {
 #'   library(shiny)
@@ -183,8 +183,8 @@ tip_input <- function(
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
-    click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
+    tip_id = NULL,
     ...) {
   if (!inherits(tag, "shiny.tag")) {
     stop("tip_input: `tag` must be a Shiny input tag", call. = FALSE)
@@ -202,8 +202,9 @@ tip_input <- function(
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, remote = !is.null(content_disabled), ...
+    tip_id = tip_id, ...
   )
+  icon <-shiny::tagAppendAttributes(icon, class = "shinytip-remote")
 
   found_label <- FALSE
   for (idx in seq_along(tag$children)) {
@@ -230,7 +231,7 @@ tip_input <- function(
 
 ### The actual workhorse of building the tooltip
 build_tip <- function(tag, content, content_disabled, position, width, theme, wrap_tag,
-                      click, remote, ...) {
+                      tip_id, ...) {
   if (!inherits(theme, "shinytip_theme")) {
     stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
   }
@@ -263,9 +264,6 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
   check_text(content_disabled)
   newlines <- (!is.null(content) && grepl("\n", content)) ||
     (!is.null(content_disabled) && grepl("\n", content_disabled))
-
-  only_disabled <- is.null(content)
-  label <- if (only_disabled) content_disabled else content
 
   css <- paste0(
     "--balloon-color: ", bg, "; ",
@@ -300,39 +298,14 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     tag,
     class = "shinytip",
     `aria-label` = "",
-    `data-balloon-nofocus` = NA,   # don't show after clicking, re-enable for keyboard focus using css
-    `data-shinytip-label` = label,
+    `data-shinytip-label` = content,
+    `data-shinytip-content-disabled` = content_disabled,
+    `data-shinytip-id` = tip_id,
     `data-balloon-pos` = position,
     `data-balloon-break` = if (newlines) NA,
     style = css,
     ...
   )
-
-  if (remote) {
-    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-remote")
-  }
-
-  if (only_disabled) {
-    tag <- shiny::tagAppendAttributes(tag, class = "shinytip-disabled-only")
-  } else if (!is.null(content_disabled)) {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      class = "shinytip-disabled-swap",
-      `data-shinytip-content-disabled` = content_disabled
-    )
-  }
-
-  # `click` is ignored when `content_disabled` is the only text, because CSS already drives
-  # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and
-  # reopen the tooltip by itself the next time it was disabled
-  if (click && !only_disabled) {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      class = "shinytip-hide",
-      `data-balloon-visible` = NA,
-      onclick = "this.classList.toggle('shinytip-hide'); return false;"
-    )
-  }
 
   if (width != "line") {
     tag <- shiny::tagAppendAttributes(
@@ -347,5 +320,5 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     )
   }
 
-  htmltools::attachDependencies(tag, shinytip_dependencies(), append = TRUE)
+  htmltools::attachDependencies(tag, shinytip_dependencies(updatable = !is.null(tip_id)), append = TRUE)
 }

@@ -69,7 +69,9 @@ question_icon <- function(solid) {
   shiny::icon("question-circle", class = if (solid) "fa-solid")
 }
 
-shinytip_dependencies <- function() {
+# The JavaScript is only needed by tooltips that can be updated, so that apps that never call
+# `tip_update()` stay free of JavaScript
+shinytip_dependencies <- function(updatable = FALSE) {
   if (is.null(.shinytipglobals$deps)) {
     .shinytipglobals$deps <- list(
       htmltools::htmlDependency(
@@ -88,5 +90,30 @@ shinytip_dependencies <- function() {
       )
     )
   }
-  .shinytipglobals$deps
+
+  if (updatable && is.null(.shinytipglobals$update_dep)) {
+    .shinytipglobals$update_dep <- c(
+      .shinytipglobals$deps,
+      list(
+        htmltools::htmlDependency(
+          name = "shinytip-update",
+          version = as.character(utils::packageVersion("shinytip")),
+          package = "shinytip",
+          src = "assets/js",
+          script = "shinytip.js"
+        )
+      )
+    )
+  }
+
+  if (updatable) {
+    .shinytipglobals$update_dep
+  } else {
+    .shinytipglobals$deps
+  }
+}
+
+# `NA` is how a caller asks for a text to be removed
+is_removal <- function(x) {
+  is.atomic(x) && length(x) == 1L && is.na(x)
 }
