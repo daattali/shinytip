@@ -17,19 +17,18 @@
 /* Support tooltips on disabled state. Which text a tooltip has decides how it behaves: only
    `data-shinytip-label` is an ordinary tooltip, only `data-shinytip-content-disabled` is shown
    only while disabled, and both swap depending on the state */
-.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):before,
-.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled, .shinytip-disabled):not(:has(:disabled, .shinytip-disabled)):after {
+.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled):not(:has(:disabled)):before,
+.shinytip:not([data-shinytip-label]):not(.shinytip-remote):not(:disabled):not(:has(:disabled)):after {
   display: none;
 }
-.shiny-input-container:not(.shinytip-disabled):not(:has(:disabled, .shinytip-disabled)) .shinytip-remote:not([data-shinytip-label]) {
+.shiny-input-container:not(:has(:disabled)) .shinytip-remote:not([data-shinytip-label]) {
   display: none;
 }
-.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):is(:disabled, .shinytip-disabled):after,
-.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):has(:disabled, .shinytip-disabled):after {
+.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):disabled:after,
+.shinytip[data-shinytip-content-disabled]:not(.shinytip-remote):has(:disabled):after {
   content: attr(data-shinytip-content-disabled);
 }
-.shiny-input-container.shinytip-disabled .shinytip-remote[data-shinytip-content-disabled]:after,
-.shiny-input-container:has(:disabled, .shinytip-disabled) .shinytip-remote[data-shinytip-content-disabled]:after {
+.shiny-input-container:has(:disabled) .shinytip-remote[data-shinytip-content-disabled]:after {
   content: attr(data-shinytip-content-disabled);
 }
 
