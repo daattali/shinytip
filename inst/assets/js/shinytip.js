@@ -18,6 +18,7 @@ Shiny.addCustomMessageHandler("shinytip-update", (msg) => {
   });
 
   function apply(el, attr, value) {
-    if (value === null) el.removeAttribute(attr); else el.setAttribute(attr, value);
+    if (value === null) el.removeAttribute(attr);
+    else el.setAttribute(attr, value);
   }
 });

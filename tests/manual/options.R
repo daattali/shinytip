@@ -7,7 +7,7 @@ options(
   "shinytip.bg" = "black",
   "shinytip.fg" = "green",
   "shinytip.fontsize" = 20,
-  "shinytip.radius" = 10,
+  "shinytip.radius" = 0,
   "shinytip.animate" = FALSE,
   "shinytip.move" = 20,
   "shinytip.pointer" = FALSE
@@ -17,13 +17,15 @@ sample_text <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 ui <- fluidPage(
   tip(
-    "default tip",
+    "default tip: bottom-left, medium, black/green, 20 fontsize, 0 radius, no animate, move 20, no pointer",
     sample_text
   ), br(),
   tip(
-    "blue tip on bottom",
+    "bottom-right, small, red/white, size 10, radius 8, animate",
     sample_text,
-    theme = tip_theme(fg = "white", bg = "red", fontsize = 30, radius = "1em", animate = TRUE)
+    position = "bottom-right",
+    width = "s",
+    theme = tip_theme(fg = "white", bg = "red", fontsize = 10, radius = "8px", animate = TRUE)
   )
 )
 server <- function(input, output, session) {
