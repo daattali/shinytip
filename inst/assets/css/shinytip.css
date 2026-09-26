@@ -3,12 +3,6 @@
   display: inline-block;
 }
 
-/* Used by `click = TRUE` to toggle a tooltip's visibility */
-.shinytip-hide:before,
-.shinytip-hide:after {
-  display: none;
-}
-
 /* Read the tooltip from our own data-shinytip-label attribute, not from aria-label */
 .shinytip[aria-label][data-balloon-pos]:after {
   content: attr(data-shinytip-label);

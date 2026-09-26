@@ -171,9 +171,7 @@ All three tooltip functions accept these parameters:
 
 - **`theme`**: A `tip_theme()` object that controls the tooltip's appearance (see the next section).
 
-`tip_icon()` and `tip_input()` accept two more:
-
-- **`click`**: By default, the tooltip is shown on hover. Use `click = TRUE` to only show it after the icon is clicked.
+`tip_icon()` and `tip_input()` accept one more:
 
 - **`solid`**: Use `solid = TRUE` to get a question-mark icon with a solid background.
 
@@ -276,7 +274,7 @@ Tooltips have a habit of working nicely in a simple example and then breaking in
 
 - Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. Use `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
 
-- On mobile and other touch devices, hovering isn't a supported interaction, so all tooltips are shown on click regardless of the `click` parameter. Dismissing a tooltip is done by tapping elsewhere rather than by tapping the element again.
+- On mobile and other touch devices, hovering isn't a supported interaction, so all tooltips are shown on tap instead. Dismissing a tooltip is done by tapping elsewhere rather than by tapping the element again.
 
 - If an element loses its opacity when it's disabled, then its tooltip will also lose its opacity. This most commonly affects tooltips on a disabled `actionButton()`. Bootstrap 5 (used by {bslib}) also prevents disabled buttons from having tooltips. Setting `wrap_tag = TRUE` solves both issues, by placing the tooltip on a wrapper element.
 

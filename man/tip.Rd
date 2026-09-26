@@ -84,8 +84,7 @@ on the page.
 \item The balloon project makes use of pseudo-elements, so if you're trying to
 add a tooltip to an element that already has pseudo-elements, it may not work. Use
 \code{wrap_tag = TRUE} to place the tooltip on a wrapper element instead, which avoids the conflict.
-\item On mobile (and other touch devices), all tooltips are only shown on click, since hovering
-is not a supported interaction.
+\item On mobile (and other touch devices), tooltips are only shown on click rather than hover.
 \item If an element loses its opacity when disabled, then the tooltip will also lose its
 opacity when the element is disabled. This commonly affects tooltips on disabled \code{actionButton()}.
 Bootstrap 5 (used by \code{{bslib}}) also prevents disabled buttons from having tooltips on hover.

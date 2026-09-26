@@ -30,8 +30,7 @@
 #' add a tooltip to an element that already has pseudo-elements, it may not work. Use
 #' `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
 #'
-#' - On mobile (and other touch devices), all tooltips are only shown on click, since hovering
-#' is not a supported interaction.
+#' - On mobile (and other touch devices), tooltips are only shown on click rather than hover.
 #'
 #' - If an element loses its opacity when disabled, then the tooltip will also lose its
 #' opacity when the element is disabled. This commonly affects tooltips on disabled `actionButton()`.
@@ -92,18 +91,15 @@ tip <- function(
     ...) {
   build_tip(
     tag = tag, content = content, content_disabled = content_disabled, position = position,
-    width = width, theme = theme, wrap_tag = wrap_tag, click = FALSE, tip_id = tip_id, ...
+    width = width, theme = theme, wrap_tag = wrap_tag, tip_id = tip_id, ...
   )
 }
 
 #' Create a tooltip icon
 #'
-#' Add a question-mark icon that shows a tooltip when hovered or clicked.
+#' Add a question-mark icon that shows a tooltip when hovered.
 #' @inheritParams tip
 #' @param content The text in the tooltip. Can include emojis, but cannot contain HTML.
-#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
-#' shown once the icon is clicked. On mobile/touch devices that do not support hover, tooltips are
-#' always shown on click regardless of this parameter.
 #' @param solid If `TRUE`, the question-mark icon will have a solid background.
 #' @param ... Additional attributes to pass to the question-mark icon.
 #' @return A Shiny icon tag that has a tooltip.
@@ -127,7 +123,6 @@ tip_icon <- function(
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
-    click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
     tip_id = NULL,
     ...) {
@@ -147,7 +142,7 @@ tip_icon <- function(
   build_tip(
     tag = question_icon(solid), content = content, content_disabled = NULL,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, tip_id = tip_id, ...
+    tip_id = tip_id, ...
   )
 }
 
@@ -157,10 +152,6 @@ tip_icon <- function(
 #' @inheritParams tip
 #' @inheritParams tip_icon
 #' @inheritSection tip Disabled inputs
-#' @param click If `FALSE` (default), the tooltip shows on hover. If `TRUE`, the tooltip is only
-#' shown once the icon is clicked. Ignored when `content_disabled` is given without `content`.
-#' On mobile/touch devices that do not support hover, tooltips are always shown on click
-#' regardless of this parameter.
 #' @param tag A Shiny input tag.
 #' @param ... Additional attributes to pass to the question-mark icon added to the label.
 #' @return The same input tag, with a question-mark icon in the label that triggers a tooltip.
@@ -190,7 +181,6 @@ tip_input <- function(
     position = getOption("shinytip.position", "top"),
     width = getOption("shinytip.width", "line"),
     theme = tip_theme(),
-    click = getOption("shinytip.click", FALSE),
     solid = getOption("shinytip.solid", FALSE),
     tip_id = NULL,
     ...) {
@@ -210,9 +200,9 @@ tip_input <- function(
   icon <- build_tip(
     tag = question_icon(solid), content = content, content_disabled = content_disabled,
     position = position, width = width, theme = theme, wrap_tag = FALSE,
-    click = click, tip_id = tip_id, ...
+    tip_id = tip_id, ...
   )
-  icon <- shiny::tagAppendAttributes(icon, class = "shinytip-remote")
+  icon <-shiny::tagAppendAttributes(icon, class = "shinytip-remote")
 
   found_label <- FALSE
   for (idx in seq_along(tag$children)) {
@@ -239,7 +229,7 @@ tip_input <- function(
 
 ### The actual workhorse of building the tooltip
 build_tip <- function(tag, content, content_disabled, position, width, theme, wrap_tag,
-                      click, tip_id, ...) {
+                      tip_id, ...) {
   if (!inherits(theme, "shinytip_theme")) {
     stop("tip: `theme` must be a `tip_theme()` object.", call. = FALSE)
   }
@@ -306,7 +296,6 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     tag,
     class = "shinytip",
     `aria-label` = "",
-    `data-balloon-nofocus` = NA,   # don't show after clicking, re-enable for keyboard focus using css
     `data-shinytip-label` = content,
     `data-shinytip-content-disabled` = content_disabled,
     `data-shinytip-id` = tip_id,
@@ -315,18 +304,6 @@ build_tip <- function(tag, content, content_disabled, position, width, theme, wr
     style = css,
     ...
   )
-
-  # `click` is ignored when `content_disabled` is the only text, because CSS already drives
-  # the tooltip's visibility, and a toggled class would outlive the input being re-enabled and
-  # reopen the tooltip by itself the next time it was disabled
-  if (click && !is.null(content)) {
-    tag <- shiny::tagAppendAttributes(
-      tag,
-      class = "shinytip-hide",
-      `data-balloon-visible` = NA,
-      onclick = "this.classList.toggle('shinytip-hide'); return false;"
-    )
-  }
 
   if (width != "line") {
     tag <- shiny::tagAppendAttributes(

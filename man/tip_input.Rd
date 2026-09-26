@@ -11,7 +11,6 @@ tip_input(
   position = getOption("shinytip.position", "top"),
   width = getOption("shinytip.width", "line"),
   theme = tip_theme(),
-  click = getOption("shinytip.click", FALSE),
   solid = getOption("shinytip.solid", FALSE),
   tip_id = NULL,
   ...
@@ -36,11 +35,6 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 
 \item{theme}{A \code{\link[=tip_theme]{tip_theme()}} object holding the tooltip's appearance (colours, font size,
 animation, cursor).}
-
-\item{click}{If \code{FALSE} (default), the tooltip shows on hover. If \code{TRUE}, the tooltip is only
-shown once the icon is clicked. Ignored when \code{content_disabled} is given without \code{content}.
-On mobile/touch devices that do not support hover, tooltips are always shown on click
-regardless of this parameter.}
 
 \item{solid}{If \code{TRUE}, the question-mark icon will have a solid background.}
 

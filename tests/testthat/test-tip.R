@@ -56,20 +56,6 @@ test_that("tip_input() works on checkboxes, which have no <label> of their own",
   expect_match(html, 'data-shinytip-content-disabled="why not"')
 })
 
-test_that("click is ignored when content_disabled is the only text", {
-  direct <- as.character(tip_icon(content = "hello", click = TRUE))
-  expect_match(direct, "onclick")
-  direct <- as.character(
-    tip_input(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
-  )
-  expect_false(grepl("onclick", direct))
-
-  remote <- as.character(
-    tip_input(shiny::textInput("test", "test"), content_disabled = "why not", click = TRUE)
-  )
-  expect_false(grepl("onclick", remote))
-})
-
 test_that("every exported function returns a shiny tag", {
   expect_s3_class(tip("x", "y"), "shiny.tag")
   expect_s3_class(tip_icon("y"), "shiny.tag")
@@ -208,23 +194,16 @@ test_that("tip() requires a tag", {
   expect_error(tip("y", "y"), NA)
 })
 
-test_that("click is only accepted by tip_icon() and tip_input()", {
-  expect_match(as.character(tip_icon("y", click = TRUE)), "onclick")
-  expect_match(as.character(tip_input(shiny::textInput("t", "T"), "y", click = TRUE)), "onclick")
-  expect_error(tip("x", "y", click = TRUE))
-})
-
 test_that("defaults can be set with global options", {
   withr::with_options(
     list(shinytip.position = "right", shinytip.width = "l",
-         shinytip.bg = "pink", shinytip.solid = TRUE, shinytip.click = TRUE),
+         shinytip.bg = "pink", shinytip.solid = TRUE),
     {
       html <- tip_tag("x", "y")
       expect_match(html, 'data-balloon-pos="right"')
       expect_match(html, 'data-balloon-length="large"')
       expect_match(html, "--balloon-color: pink", fixed = TRUE)
       expect_match(as.character(tip_icon("y")), "fa-solid")
-      expect_match(as.character(tip_icon("y")), "onclick")
     }
   )
 })
