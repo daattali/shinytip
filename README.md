@@ -163,7 +163,7 @@ remotes::install_github("daattali/shinytip")
 
 <h2 id="customize">Customizing the tooltip</h2>
 
-All three tooltip functions accept these parameters:
+Each tooltip can also be customized with the following parameters:
 
 - **`position`**: Where the tooltip appears in relation to the element. One of `"top"` (default), `"bottom"`, `"left"`, `"right"`, `"top-left"`, `"top-right"`, `"bottom-left"`, `"bottom-right"`.
 
@@ -171,13 +171,9 @@ All three tooltip functions accept these parameters:
 
 - **`theme`**: A `tip_theme()` object that controls the tooltip's appearance (see the next section).
 
-`tip_icon()` and `tip_input()` accept one more:
+- **`solid`** *(not accepted by `tip()`)*: Use `solid = TRUE` to get a question-mark icon with a solid background.
 
-- **`solid`**: Use `solid = TRUE` to get a question-mark icon with a solid background.
-
-`tip()` accepts one more:
-
-- **`wrap_tag`**: Use `wrap_tag = TRUE` to wrap the element in a `<div>`. This is the fix for an element that can't carry a tooltip of its own, most often a disabled input (see [Limitations](#limitations)). It's opt-in because the extra `<div>` can affect the UI layout.
+- **`wrap_tag`** *(only accepted by `tip()`)*: Use `wrap_tag = TRUE` to wrap the element in a `<div>`. This can fix a variety of issues, most often a disabled input (see [Limitations](#limitations)). It's opt-in because the extra `<div>` can affect the UI layout.
 
 <h2 id="themes">Tooltip theme</h2>
 
@@ -268,15 +264,17 @@ Tooltips have a habit of working nicely in a simple example and then breaking in
 
 <h2 id="limitations">Limitations</h2>
 
-- The best position for a tooltip is not detected automatically, so a tooltip near the edge of the page can run off-screen and you'll need to choose a different `position` yourself.
+- The best position for a tooltip cannot be detected automatically, so a tooltip near the edge of the page can run off-screen and you'll need to choose a different `position` yourself.
 
 - The tooltip text cannot contain HTML.
 
-- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. Use `wrap_tag = TRUE` to place the tooltip on a wrapper element instead, which avoids the conflict.
+- On mobile (and other touch devices), tooltips are shown on click rather than hover.
 
-- On mobile and other touch devices, hovering isn't a supported interaction, so all tooltips are shown on tap instead. Dismissing a tooltip is done by tapping elsewhere rather than by tapping the element again.
+- Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that already makes use of pseudo-elements, the two will conflict and you may get unexpected results. This can be fixed by using `wrap_tag = TRUE`.
 
-- If an element loses its opacity when it's disabled, then its tooltip will also lose its opacity. This most commonly affects tooltips on a disabled `actionButton()`. Bootstrap 5 (used by {bslib}) also prevents disabled buttons from having tooltips. Setting `wrap_tag = TRUE` solves both issues, by placing the tooltip on a wrapper element.
+- If an element becomes partially transparent when disabled (such as buttons), then the tooltip will also have the same transparency when the element is disabled. This can be fixed by using `wrap_tag = TRUE`.
+
+- Bootstrap 5 (used by `{bslib}`) prevents disabled buttons from having tooltips on hover. This can be fixed by using `wrap_tag = TRUE`.
 
 <h2 id="similar">Similar packages</h2>
 

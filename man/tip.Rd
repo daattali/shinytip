@@ -37,10 +37,10 @@ line), \code{"fit"} (the tooltip should have the same width as the tag), \code{"
 animation, cursor).}
 
 \item{wrap_tag}{If \code{TRUE}, wrap \code{tag} in a \verb{<div>} and place the tooltip on that wrapper rather
-than on the tag itself. Use this when the tag cannot carry a tooltip of its own: a disabled input
-passes its faded appearance onto the tooltip (and under Bootstrap 5 hides it entirely), and a
-tag that already uses pseudo-elements will conflict with the tooltip. This behaviour is opt-in
-because the extra \verb{<div>} can affect the UI layout.}
+than on the tag itself. This can be used to fix a variety of different issues: if the tag cannot
+carry a tooltip of its own; if a disabled button's tooltip is partially transparent; if a disabled
+button in Bootstrap 5 doesn't have a tooltip; if a tag already has pseudo-elements that conflict
+with the tooltip.  This behaviour is opt-in because the extra \verb{<div>} can affect the UI layout.}
 
 \item{tip_id}{An optional ID for the tooltip, which is only needed if you want to use
 \code{\link[=tip_update]{tip_update()}} to update the tooltip's text from the server. In a Shiny module, wrap it in \code{ns()}.}
@@ -53,11 +53,11 @@ A Shiny tag that supports tooltips.
 \description{
 Tooltips can be added to any Shiny UI elements such as tags, inputs, outputs, or plain text.
 Tooltips are powered by the project \code{balloon.css}.\cr\cr
-All the theme parameters, along with \code{position} and \code{width}, can be set globally in order to use
+Most parameters, including the \code{theme} parameters, can be set globally in order to use
 a default setting for all tooltips in your Shiny app. This can be done by setting an R option with
 the parameter's name prepended by \code{"shinytip."}. For example, to set all tooltips to appear on the
 right and have a red background, use \code{options(shinytip.position = "right", shinytip.bg = "red")}.
-Only \code{tag}, \code{content}, and \code{content_disabled} cannot be set globally.
+Only \code{tag}, \code{content}, \code{content_disabled}, and \code{tip_id} cannot be set globally.
 }
 \details{
 Note that when adding a tooltip to an \verb{<img>} tag or an icon (such as fontawesome),
@@ -78,17 +78,17 @@ Any inputs disabled with \code{shinyjs::disable()} are automatically detected.
 \section{Limitations}{
 
 \itemize{
-\item The best position for the tooltip cannot be detected automatically.
-This means that you may need to adjust the position of the tooltip depending on where it appears
-on the page.
-\item The balloon project makes use of pseudo-elements, so if you're trying to
-add a tooltip to an element that already has pseudo-elements, it may not work. Use
-\code{wrap_tag = TRUE} to place the tooltip on a wrapper element instead, which avoids the conflict.
-\item On mobile (and other touch devices), tooltips are only shown on click rather than hover.
-\item If an element loses its opacity when disabled, then the tooltip will also lose its
-opacity when the element is disabled. This commonly affects tooltips on disabled \code{actionButton()}.
-Bootstrap 5 (used by \code{{bslib}}) also prevents disabled buttons from having tooltips on hover.
-Both these issues are fixed by \code{wrap_tag = TRUE}, which moves the tooltip onto a wrapper element.
+\item The best position for a tooltip cannot be detected automatically, so a tooltip near the
+edge of the page can run off-screen and you'll need to choose a different \code{position} yourself.
+\item The tooltip text cannot contain HTML.
+\item On mobile (and other touch devices), tooltips are shown on click rather than hover.
+\item Tooltips are drawn using CSS pseudo-elements, so if you add a tooltip to an element that
+already makes use of pseudo-elements, the two will conflict and you may get unexpected results.
+This can be fixed by using \code{wrap_tag = TRUE}.
+\item If an element becomes partially transparent when disabled (such as buttons), then the tooltip will also have the
+same transparency when the element is disabled. This can be fixed by using \code{wrap_tag = TRUE}.
+\item Bootstrap 5 (used by \code{{bslib}}) prevents disabled buttons from having tooltips on hover.
+This can be fixed by using \code{wrap_tag = TRUE}.
 }
 }
 

@@ -1,11 +1,6 @@
 library(shiny)
 library(shinytip)
 
-# Toggle the button to disable/enable every input, and check that:
-#  - the "only disabled" tooltips are invisible (and their icons hidden) while enabled
-#  - the "both texts" tooltips swap their text when the state changes
-#  - hovering a disabled input still triggers its tooltip
-
 ui <- fluidPage(
   shinyjs::useShinyjs(),
   br(),
